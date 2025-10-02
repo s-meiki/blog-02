@@ -1,0 +1,6 @@
+node_modules
+.sanity
+.dist
+.sanity-runtime
+.env.local
+

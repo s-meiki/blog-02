@@ -1,0 +1,49 @@
+@import "tailwindcss";
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  @apply bg-neutral-50 text-neutral-800 antialiased;
+}
+
+a {
+  @apply text-primary-600 transition-colors hover:text-primary-500;
+}
+
+.prose {
+  @apply max-w-none text-neutral-800;
+}
+
+.prose h2 {
+  @apply mt-10 text-2xl font-semibold text-neutral-900;
+}
+
+.prose h3 {
+  @apply mt-8 text-xl font-semibold text-neutral-900;
+}
+
+.prose h4 {
+  @apply mt-6 text-lg font-semibold text-neutral-900;
+}
+
+.prose p {
+  @apply my-4 leading-relaxed;
+}
+
+.prose pre {
+  @apply rounded-xl bg-neutral-900 p-4 text-sm text-neutral-100;
+}
+
+.prose code {
+  @apply rounded bg-neutral-100 px-1.5 py-0.5 text-sm;
+}
+
+.prose blockquote {
+  @apply border-l-4 border-primary-500 bg-primary-50/70 px-4 py-3 italic text-neutral-700;
+}
+
+.prose img {
+  @apply my-6 rounded-2xl shadow-soft;
+}
