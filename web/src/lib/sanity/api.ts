@@ -1,5 +1,7 @@
 import { cache } from "react";
 
+import type { QueryParams } from "@sanity/client";
+
 import { sanityFetch } from "./fetch";
 import {
   authorDetailQuery,
@@ -64,18 +66,38 @@ export const getPaginatedPosts = cache(async (params: ListParams = {}) => {
   const offset = (page - 1) * limit;
   const pattern = params.query ? `*${params.query.toLowerCase()}*` : undefined;
 
+  const listParams: QueryParams = { offset, limit };
+  const countParams: QueryParams = {};
+
+  if (params.query) {
+    listParams.search = params.query;
+    countParams.search = params.query;
+  }
+
+  if (pattern) {
+    listParams.pattern = pattern;
+    countParams.pattern = pattern;
+  }
+
+  if (params.category) {
+    listParams.category = params.category;
+    countParams.category = params.category;
+  }
+
+  if (params.tag) {
+    listParams.tagSlug = params.tag;
+    countParams.tagSlug = params.tag;
+  }
+
+  if (params.author) {
+    listParams.author = params.author;
+    countParams.author = params.author;
+  }
+
   const [items, total] = await Promise.all([
     sanityFetch<PostListItem[]>(
       paginatedPostsQuery,
-      {
-        query: params.query,
-        category: params.category,
-        tag: params.tag,
-        author: params.author,
-        offset,
-        limit,
-        pattern,
-      },
+      listParams,
       {
         revalidate: 120,
         tags: ["post"],
@@ -83,13 +105,7 @@ export const getPaginatedPosts = cache(async (params: ListParams = {}) => {
     ),
     sanityFetch<number>(
       paginatedPostsCountQuery,
-      {
-        query: params.query,
-        category: params.category,
-        tag: params.tag,
-        author: params.author,
-        pattern,
-      },
+      countParams,
       {
         revalidate: 120,
         tags: ["post"],
@@ -177,4 +193,3 @@ export const getAllPages = cache(async () =>
     { revalidate: 3600, tags: ["page"] },
   ),
 );
-

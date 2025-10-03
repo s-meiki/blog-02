@@ -39,9 +39,10 @@ const portableTextToPlainText = (blocks?: PortableTextBlock[]) =>
     .join("\n")
     .trim();
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
   const [author, settings] = await Promise.all([
-    getAuthorBySlug(params.slug),
+    getAuthorBySlug(slug),
     getSiteSettings(),
   ]);
 
@@ -77,10 +78,11 @@ export default async function AuthorPage({
   params,
   searchParams,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const resolvedParams = await (searchParams ?? Promise.resolve({}));
+  const { slug } = await params;
   const queryParams = Object.fromEntries(
     Object.entries(resolvedParams).map(([key, value]) => [key, Array.isArray(value) ? value[0] : value]),
   ) as Record<string, string | undefined>;
@@ -89,9 +91,9 @@ export default async function AuthorPage({
   const page = toNumber(queryParams.page, 1);
 
   const [author, popularPosts, postsResult] = await Promise.all([
-    getAuthorBySlug(params.slug),
+    getAuthorBySlug(slug),
     getPopularPosts(),
-    getPaginatedPosts({ author: params.slug, query, page }),
+    getPaginatedPosts({ author: slug, query, page }),
   ]);
 
   if (!author) {
@@ -109,7 +111,7 @@ export default async function AuthorPage({
       paramsClone.set("page", String(pageNumber));
     }
     const queryString = paramsClone.toString();
-    return queryString ? `/author/${params.slug}?${queryString}` : `/author/${params.slug}`;
+    return queryString ? `/author/${slug}?${queryString}` : `/author/${slug}`;
   };
 
   return (
@@ -155,7 +157,7 @@ export default async function AuthorPage({
         </section>
 
         <div className="space-y-6">
-          <BlogSearchForm actionPath={`/author/${params.slug}`} />
+          <BlogSearchForm actionPath={`/author/${slug}`} />
           {postsResult.items.length > 0 ? (
             <div className="grid gap-8 md:grid-cols-2">
               {postsResult.items.map((post) => (

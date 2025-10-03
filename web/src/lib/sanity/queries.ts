@@ -43,9 +43,9 @@ export const popularPostsQuery = groq`*[_type == "post" && defined(slug.current)
   }`;
 
 export const paginatedPostsQuery = groq`*[_type == "post" && defined(slug.current) && !(_id in path("drafts.**")) && publishedAt <= now()
-    && (!defined($query) || title match $pattern || excerpt match $pattern || $query in tags)
+    && (!defined($search) || title match $pattern || excerpt match $pattern || $search in tags)
     && (!defined($category) || $category in categories[]->slug.current)
-    && (!defined($tag) || $tag in tags)
+    && (!defined($tagSlug) || $tagSlug in tags)
     && (!defined($author) || $author == author->slug.current)
   ] | order(publishedAt desc)[$offset...$offset + $limit - 1]{
     _id,
@@ -69,9 +69,9 @@ export const paginatedPostsQuery = groq`*[_type == "post" && defined(slug.curren
   }`;
 
 export const paginatedPostsCountQuery = groq`count(*[_type == "post" && defined(slug.current) && !(_id in path("drafts.**")) && publishedAt <= now()
-    && (!defined($query) || title match $pattern || excerpt match $pattern || $query in tags)
+    && (!defined($search) || title match $pattern || excerpt match $pattern || $search in tags)
     && (!defined($category) || $category in categories[]->slug.current)
-    && (!defined($tag) || $tag in tags)
+    && (!defined($tagSlug) || $tagSlug in tags)
     && (!defined($author) || $author == author->slug.current)
   ])`;
 

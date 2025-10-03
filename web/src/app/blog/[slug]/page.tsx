@@ -18,7 +18,7 @@ import {
   relatedPostsQuery,
   singlePostQuery,
 } from "@/lib/sanity/queries";
-import type { PostDetail } from "@/lib/sanity/types";
+import type { PostDetail, PostListItem } from "@/lib/sanity/types";
 import { extractHeadings } from "@/lib/utils/headings";
 import { buildBlogPostingJsonLd, buildBreadcrumbJsonLd } from "@/lib/structured-data";
 import type { Metadata } from "next";
@@ -31,8 +31,9 @@ export async function generateStaticParams() {
   return slugs?.map((entry) => ({ slug: entry.slug })) ?? [];
 }
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const post = await sanityFetch<PostDetail | null>(singlePostQuery, { slug: params.slug }, { revalidate: 60, tags: ["post", `post:${params.slug}`] });
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const post = await sanityFetch<PostDetail | null>(singlePostQuery, { slug }, { revalidate: 60, tags: ["post", `post:${slug}`] });
   if (!post) {
     return {
       title: "記事が見つかりません",
@@ -63,12 +64,10 @@ export async function generateMetadata({ params }: { params: { slug: string } })
         : settings?.defaultOgImage
         ? [{ url: settings.defaultOgImage }]
         : undefined,
-      article: {
-        authors: post.author?.name ? [post.author.name] : undefined,
-        tags: post.tags,
-        publishedTime: post.publishedAt,
-        modifiedTime: post.updatedAt ?? post.publishedAt,
-      },
+      authors: post.author?.name ? [post.author.name] : undefined,
+      tags: post.tags,
+      publishedTime: post.publishedAt,
+      modifiedTime: post.updatedAt ?? post.publishedAt,
     },
     twitter: {
       card: "summary_large_image",
@@ -85,9 +84,10 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   };
 }
 
-export default async function PostPage({ params }: { params: { slug: string } }) {
+export default async function PostPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
   const [post, settings, popularPosts] = await Promise.all([
-    sanityFetch<PostDetail | null>(singlePostQuery, { slug: params.slug }, { revalidate: 60, tags: ["post", `post:${params.slug}`] }),
+    sanityFetch<PostDetail | null>(singlePostQuery, { slug }, { revalidate: 60, tags: ["post", `post:${slug}`] }),
     getSiteSettings(),
     getPopularPosts(),
   ]);
@@ -96,9 +96,9 @@ export default async function PostPage({ params }: { params: { slug: string } })
     notFound();
   }
 
-  const relatedPosts = await sanityFetch(
+  const relatedPosts = await sanityFetch<PostListItem[]>(
     relatedPostsQuery,
-    { slug: params.slug, category: post.categories?.[0]?.slug },
+    { slug, category: post.categories?.[0]?.slug },
     { revalidate: 300, tags: ["post"] },
   );
 

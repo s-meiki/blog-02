@@ -282,9 +282,9 @@ const toNumber = (value: unknown, fallback: number) => {
 };
 
 const filterPosts = (params: QueryParams) => {
-  const query = typeof params.query === "string" ? params.query.toLowerCase() : undefined;
+  const query = typeof params.search === "string" ? params.search.toLowerCase() : undefined;
   const category = typeof params.category === "string" ? params.category : undefined;
-  const tag = typeof params.tag === "string" ? params.tag : undefined;
+  const tag = typeof params.tagSlug === "string" ? params.tagSlug : undefined;
   const author = typeof params.author === "string" ? params.author : undefined;
 
   return sortByPublishedDesc(

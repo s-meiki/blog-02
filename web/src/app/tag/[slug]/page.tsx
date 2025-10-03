@@ -50,9 +50,10 @@ export async function generateStaticParams() {
   return slugs?.map((entry) => ({ slug: entry.slug })) ?? [];
 }
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
   const [tag, settings] = await Promise.all([
-    getTagBySlug(params.slug),
+    getTagBySlug(slug),
     getSiteSettings(),
   ]);
 
@@ -69,10 +70,11 @@ export default async function TagPage({
   params,
   searchParams,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const resolvedParams = await (searchParams ?? Promise.resolve({}));
+  const { slug } = await params;
   const queryParams = Object.fromEntries(
     Object.entries(resolvedParams).map(([key, value]) => [key, Array.isArray(value) ? value[0] : value]),
   ) as Record<string, string | undefined>;
@@ -81,9 +83,9 @@ export default async function TagPage({
   const page = toNumber(queryParams.page, 1);
 
   const [tag, popularPosts, postsResult] = await Promise.all([
-    getTagBySlug(params.slug),
+    getTagBySlug(slug),
     getPopularPosts(),
-    getPaginatedPosts({ tag: params.slug, query, page }),
+    getPaginatedPosts({ tag: slug, query, page }),
   ]);
 
   if (!tag) {
@@ -101,7 +103,7 @@ export default async function TagPage({
       paramsClone.set("page", String(pageNumber));
     }
     const queryString = paramsClone.toString();
-    return queryString ? `/tag/${params.slug}?${queryString}` : `/tag/${params.slug}`;
+    return queryString ? `/tag/${slug}?${queryString}` : `/tag/${slug}`;
   };
 
   return (
@@ -123,7 +125,7 @@ export default async function TagPage({
         <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_320px]">
           <div className="space-y-10">
             <div className="space-y-4">
-              <BlogSearchForm actionPath={`/tag/${params.slug}`} />
+              <BlogSearchForm actionPath={`/tag/${slug}`} />
             </div>
 
             {postsResult.items.length > 0 ? (

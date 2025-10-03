@@ -52,9 +52,10 @@ export async function generateStaticParams() {
   return slugs?.map((entry) => ({ slug: entry.slug })) ?? [];
 }
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
   const [category, settings] = await Promise.all([
-    getCategoryBySlug(params.slug),
+    getCategoryBySlug(slug),
     getSiteSettings(),
   ]);
 
@@ -72,10 +73,11 @@ export default async function CategoryPage({
   params,
   searchParams,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const resolvedParams = await (searchParams ?? Promise.resolve({}));
+  const { slug } = await params;
   const queryParams = Object.fromEntries(
     Object.entries(resolvedParams).map(([key, value]) => [key, Array.isArray(value) ? value[0] : value]),
   ) as Record<string, string | undefined>;
@@ -84,10 +86,10 @@ export default async function CategoryPage({
   const page = toNumber(queryParams.page, 1);
 
   const [category, settings, popularPosts, postsResult] = await Promise.all([
-    getCategoryBySlug(params.slug),
+    getCategoryBySlug(slug),
     getSiteSettings(),
     getPopularPosts(),
-    getPaginatedPosts({ category: params.slug, query, page }),
+    getPaginatedPosts({ category: slug, query, page }),
   ]);
 
   if (!category) {
@@ -105,7 +107,7 @@ export default async function CategoryPage({
       paramsClone.set("page", String(pageNumber));
     }
     const queryString = paramsClone.toString();
-    return queryString ? `/category/${params.slug}?${queryString}` : `/category/${params.slug}`;
+    return queryString ? `/category/${slug}?${queryString}` : `/category/${slug}`;
   };
 
   return (
@@ -127,7 +129,7 @@ export default async function CategoryPage({
         <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_320px]">
           <div className="space-y-10">
             <div className="space-y-4">
-              <BlogSearchForm actionPath={`/category/${params.slug}`} />
+              <BlogSearchForm actionPath={`/category/${slug}`} />
               <p className="text-sm text-neutral-500">
                 全 {postsResult.total} 件の記事
                 {postsResult.items[0]?.publishedAt && (

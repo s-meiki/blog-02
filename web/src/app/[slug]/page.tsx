@@ -16,7 +16,7 @@ type PageParams = {
 };
 
 type PageProps = {
-  params: PageParams;
+  params: Promise<PageParams>;
 };
 
 const stripTrailingSlash = (url?: string | null) => (url ? url.replace(/\/$/, "") : undefined);
@@ -37,7 +37,8 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const [page, settings] = await Promise.all([getPageBySlug(params.slug), getSiteSettings()]);
+  const { slug } = await params;
+  const [page, settings] = await Promise.all([getPageBySlug(slug), getSiteSettings()]);
 
   if (!page) {
     return {
@@ -74,7 +75,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function StaticPage({ params }: PageProps) {
-  const [page, settings] = await Promise.all([getPageBySlug(params.slug), getSiteSettings()]);
+  const { slug } = await params;
+  const [page, settings] = await Promise.all([getPageBySlug(slug), getSiteSettings()]);
 
   if (!page) {
     notFound();
