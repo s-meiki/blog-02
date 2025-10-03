@@ -60,13 +60,13 @@ export default async function BlogPage({
   if (category) searchParamsObject.set("category", category);
 
   return (
-    <div className="py-16">
-      <Container className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_320px]">
-        <div className="space-y-10">
+    <div className="py-16 sm:py-20">
+      <Container className="grid gap-14 lg:grid-cols-[minmax(0,1fr)_320px]">
+        <div className="space-y-12">
           <div className="space-y-6">
             <div className="space-y-3">
-              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-primary-500">Blog</p>
-              <h1 className="text-3xl font-display font-bold text-neutral-900">記事一覧</h1>
+              <p className="text-xs font-semibold uppercase tracking-[0.35em] text-primary-500">Blog</p>
+              <h1 className="text-3xl font-display font-semibold text-primary-900">記事一覧</h1>
               <p className="text-neutral-600">
                 検索やタグ・カテゴリフィルタを活用して、目的の記事を素早く見つけましょう。
               </p>
@@ -95,14 +95,14 @@ export default async function BlogPage({
         </div>
 
         <aside className="space-y-8">
-          <section className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
-            <h2 className="text-lg font-semibold text-neutral-900">人気記事</h2>
+          <section className="rounded-3xl border border-primary-900/10 bg-white/90 p-6 shadow-soft">
+            <h2 className="text-lg font-display text-primary-900">人気記事</h2>
             <ul className="mt-4 space-y-4">
               {(popularPosts ?? []).map((post) => (
                 <li key={post._id}>
                   <Link
                     href={`/blog/${post.slug}`}
-                    className="text-sm text-neutral-700 transition-colors hover:text-primary-600"
+                    className="text-sm text-primary-800 transition-colors hover:text-primary-600"
                   >
                     {post.title}
                   </Link>

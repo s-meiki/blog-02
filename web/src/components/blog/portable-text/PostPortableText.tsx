@@ -41,8 +41,8 @@ const components: PortableTextComponents = {
       );
     },
     codeBlock: ({ value }: { value: CodeBlockValue }) => (
-      <pre className="prose-code my-6 overflow-x-auto rounded-xl bg-neutral-900 p-4 text-sm text-neutral-100">
-        {value.filename && <div className="mb-2 text-xs uppercase tracking-wide text-neutral-400">{value.filename}</div>}
+      <pre className="prose-code my-6 overflow-x-auto rounded-xl bg-primary-900/95 p-4 text-sm text-neutral-100">
+        {value.filename && <div className="mb-2 text-xs uppercase tracking-[0.4em] text-neutral-300">{value.filename}</div>}
         <code>{value.code}</code>
       </pre>
     ),
@@ -53,7 +53,7 @@ const components: PortableTextComponents = {
       return (
         <a
           href={value?.href}
-          className="text-primary-600 underline decoration-primary-200 underline-offset-4 transition hover:text-primary-500"
+          className="text-primary-700 underline decoration-accent-300 underline-offset-6 transition hover:text-primary-600"
           target={isExternal ? "_blank" : undefined}
           rel={isExternal ? "noreferrer" : undefined}
         >

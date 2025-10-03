@@ -1,16 +1,16 @@
 import "./globals.css";
 
 import type { Metadata } from "next";
-import { Inter, Noto_Sans_JP, Poppins } from "next/font/google";
+import { Inter, Noto_Sans_JP, Noto_Serif_JP } from "next/font/google";
 
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
 import { SkipLink } from "@/components/ui/skip-link";
 import { getSiteSettings } from "@/lib/sanity/api";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
-const noto = Noto_Sans_JP({ subsets: ["latin"], weight: ["400", "500", "700"], variable: "--font-noto" });
-const display = Poppins({ subsets: ["latin"], weight: ["500", "600", "700"], variable: "--font-display" });
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
+const notoSans = Noto_Sans_JP({ subsets: ["latin"], weight: ["400", "500", "700"], variable: "--font-noto-sans", display: "swap" });
+const notoSerif = Noto_Serif_JP({ subsets: ["latin"], weight: ["400", "600", "700"], variable: "--font-noto-serif", display: "swap" });
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSiteSettings();
@@ -44,8 +44,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const settings = await getSiteSettings();
 
   return (
-    <html lang="ja" className={`${inter.variable} ${noto.variable} ${display.variable}`}>
-      <body className="flex min-h-screen flex-col font-sans">
+    <html lang="ja" className={`${inter.variable} ${notoSans.variable} ${notoSerif.variable}`}>
+      <body className="flex min-h-screen flex-col bg-neutral-50 text-neutral-800">
         <SkipLink />
         <Header settings={settings ?? undefined} />
         <main id="main" className="flex-1">

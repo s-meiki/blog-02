@@ -34,19 +34,22 @@ export const BlogSearchForm = ({ actionPath = "/blog", staticParams = {} }: Blog
   };
 
   return (
-    <form action={handleSubmit} className="flex items-center gap-2 rounded-full border border-neutral-200 bg-white px-4 py-2">
-      <Search className="h-4 w-4 text-neutral-500" />
+    <form
+      action={handleSubmit}
+      className="flex items-center gap-3 rounded-full border border-primary-900/10 bg-white/90 px-5 py-2 shadow-soft backdrop-blur"
+    >
+      <Search className="h-4 w-4 text-primary-500" />
       <input
         type="search"
         name="q"
         placeholder="キーワードで検索"
         defaultValue={search}
         onChange={(event) => setSearch(event.target.value)}
-        className="w-full bg-transparent text-sm outline-none"
+        className="w-full bg-transparent text-sm text-neutral-700 outline-none placeholder:text-neutral-400"
       />
       <button
         type="submit"
-        className="rounded-full bg-primary-600 px-4 py-1.5 text-sm font-medium text-white transition-colors hover:bg-primary-500"
+        className="rounded-full bg-primary-800 px-5 py-1.5 text-sm font-medium text-white transition-colors hover:bg-primary-700 disabled:opacity-70"
         disabled={isPending}
       >
         検索

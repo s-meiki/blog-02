@@ -44,16 +44,16 @@ export const TableOfContents = ({ headings }: { headings: HeadingItem[] }) => {
   if (!headings.length) return null;
 
   return (
-    <nav className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
-      <p className="text-sm font-semibold text-neutral-500">目次</p>
+    <nav className="rounded-3xl border border-primary-900/10 bg-white/90 p-6 shadow-soft">
+      <p className="text-xs font-semibold uppercase tracking-[0.3em] text-primary-500">目次</p>
       <ul className="mt-4 space-y-2 text-sm text-neutral-600">
         {headings.map((heading) => (
           <li key={heading.id}>
             <a
               href={`#${heading.id}`}
               className={cn(
-                "block rounded-md px-2 py-1 transition hover:bg-primary-100 hover:text-primary-700",
-                activeId === heading.id && "bg-primary-50 text-primary-700",
+                "block rounded-lg px-2 py-1 transition hover:bg-primary-50/80 hover:text-primary-700",
+                activeId === heading.id && "bg-primary-50 text-primary-700 shadow-inset",
                 heading.level === 3 && "ml-4",
                 heading.level >= 4 && "ml-8",
               )}

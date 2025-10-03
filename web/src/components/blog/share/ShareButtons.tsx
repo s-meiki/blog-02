@@ -4,8 +4,6 @@ import { useMemo } from "react";
 import { Facebook, LinkIcon, Share2, Twitter } from "lucide-react";
 
 import type { PostDetail } from "@/lib/sanity/types";
-import { cn } from "@/lib/utils/cn";
-
 const shareBase = {
   twitter: "https://twitter.com/intent/tweet",
   facebook: "https://www.facebook.com/sharer/sharer.php",
@@ -40,14 +38,12 @@ export const ShareButtons = ({ post }: { post: PostDetail }) => {
   };
 
   return (
-    <div className="flex flex-wrap items-center gap-3 text-sm">
+    <div className="flex flex-wrap items-center gap-3 text-sm text-primary-800">
       <span className="font-medium text-neutral-600">この記事をシェアする</span>
       <button
         type="button"
         onClick={() => handleShare("twitter")}
-        className={cn(
-          "inline-flex items-center gap-2 rounded-full border border-neutral-200 px-4 py-2 transition hover:border-primary-400 hover:text-primary-600",
-        )}
+        className="inline-flex items-center gap-2 rounded-full border border-primary-900/15 px-4 py-2 transition hover:border-primary-700 hover:text-primary-700"
         aria-label="X (Twitter) でシェア"
       >
         <Twitter className="h-4 w-4" />
@@ -56,7 +52,7 @@ export const ShareButtons = ({ post }: { post: PostDetail }) => {
       <button
         type="button"
         onClick={() => handleShare("facebook")}
-        className="inline-flex items-center gap-2 rounded-full border border-neutral-200 px-4 py-2 transition hover:border-primary-400 hover:text-primary-600"
+        className="inline-flex items-center gap-2 rounded-full border border-primary-900/15 px-4 py-2 transition hover:border-primary-700 hover:text-primary-700"
         aria-label="Facebook でシェア"
       >
         <Facebook className="h-4 w-4" />
@@ -65,7 +61,7 @@ export const ShareButtons = ({ post }: { post: PostDetail }) => {
       <button
         type="button"
         onClick={handleCopy}
-        className="inline-flex items-center gap-2 rounded-full border border-neutral-200 px-4 py-2 transition hover:border-primary-400 hover:text-primary-600"
+        className="inline-flex items-center gap-2 rounded-full border border-primary-900/15 px-4 py-2 transition hover:border-primary-700 hover:text-primary-700"
         aria-label="リンクをコピー"
       >
         <LinkIcon className="h-4 w-4" />
@@ -75,7 +71,7 @@ export const ShareButtons = ({ post }: { post: PostDetail }) => {
         <button
           type="button"
           onClick={() => navigator.share({ title: post.title, url: shareUrl })}
-          className="inline-flex items-center gap-2 rounded-full border border-neutral-200 px-4 py-2 transition hover:border-primary-400 hover:text-primary-600"
+          className="inline-flex items-center gap-2 rounded-full border border-primary-900/15 px-4 py-2 transition hover:border-primary-700 hover:text-primary-700"
           aria-label="共有メニューを開く"
         >
           <Share2 className="h-4 w-4" />

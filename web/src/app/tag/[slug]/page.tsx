@@ -107,7 +107,7 @@ export default async function TagPage({
   };
 
   return (
-    <div className="py-16">
+    <div className="py-16 sm:py-20">
       <Container className="space-y-12">
         <Breadcrumbs
           items={[
@@ -117,8 +117,8 @@ export default async function TagPage({
           ]}
         />
         <header className="space-y-4">
-          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-primary-500">Tag</p>
-          <h1 className="text-4xl font-display font-bold text-neutral-900">#{tag.title}</h1>
+          <p className="text-xs font-semibold uppercase tracking-[0.35em] text-primary-500">Tag</p>
+          <h1 className="text-4xl font-display font-semibold text-primary-900">#{tag.title}</h1>
           {tag.description && <p className="max-w-2xl text-neutral-600">{tag.description}</p>}
         </header>
 
@@ -135,7 +135,7 @@ export default async function TagPage({
                 ))}
               </div>
             ) : (
-              <div className="rounded-2xl border border-dashed border-neutral-200 p-12 text-center text-neutral-500">
+              <div className="rounded-3xl border border-dashed border-primary-900/20 p-12 text-center text-neutral-500">
                 このタグの記事はまだありません。
               </div>
             )}
@@ -148,12 +148,12 @@ export default async function TagPage({
           </div>
 
           <aside className="space-y-8">
-            <section className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
-              <h2 className="text-lg font-semibold text-neutral-900">人気記事</h2>
+            <section className="rounded-3xl border border-primary-900/10 bg-white/90 p-6 shadow-soft">
+              <h2 className="text-lg font-display text-primary-900">人気記事</h2>
               <ul className="mt-4 space-y-4">
                 {(popularPosts ?? []).map((post) => (
                   <li key={post._id}>
-                    <Link href={`/blog/${post.slug}`} className="text-sm text-neutral-700 transition-colors hover:text-primary-600">
+                    <Link href={`/blog/${post.slug}`} className="text-sm text-primary-800 transition-colors hover:text-primary-600">
                       {post.title}
                     </Link>
                   </li>

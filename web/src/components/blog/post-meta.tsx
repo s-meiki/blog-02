@@ -8,12 +8,16 @@ export const PostMeta = ({ post }: { post: PostDetail }) => (
     <time dateTime={post.publishedAt}>{formatDate(post.publishedAt)}</time>
     {post.readingTime && <span>{post.readingTime}分で読めます</span>}
     {post.author?.name && (
-      <Link href={`/author/${post.author.slug}`} className="text-neutral-700 hover:text-primary-600">
+      <Link href={`/author/${post.author.slug}`} className="text-primary-700 hover:text-primary-600">
         {post.author.name}
       </Link>
     )}
     {post.categories?.map((category) => (
-      <Link key={category.slug} href={`/category/${category.slug}`} className="rounded-full bg-primary-100 px-3 py-1 text-xs font-medium text-primary-700">
+      <Link
+        key={category.slug}
+        href={`/category/${category.slug}`}
+        className="rounded-full border border-primary-900/15 px-3 py-1 text-xs font-medium text-primary-700"
+      >
         {category.title}
       </Link>
     ))}

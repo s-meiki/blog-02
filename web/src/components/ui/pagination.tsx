@@ -32,8 +32,8 @@ export const Pagination = ({ currentPage, totalPages, hrefBuilder }: PaginationP
                   className={cn(
                     "inline-flex min-w-[40px] items-center justify-center rounded-full border px-3 py-1 text-sm font-medium transition-colors",
                     page === currentPage
-                      ? "border-primary-500 bg-primary-500 text-white"
-                      : "border-neutral-200 text-neutral-600 hover:border-primary-400 hover:text-primary-600",
+                      ? "border-primary-800 bg-primary-800 text-white shadow-soft"
+                      : "border-primary-900/15 text-neutral-600 hover:border-primary-700 hover:text-primary-700",
                   )}
                 >
                   {page}

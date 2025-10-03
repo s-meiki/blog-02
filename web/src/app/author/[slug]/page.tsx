@@ -115,7 +115,7 @@ export default async function AuthorPage({
   };
 
   return (
-    <div className="py-16">
+    <div className="py-16 sm:py-20">
       <Container className="space-y-12">
         <Breadcrumbs
           items={[
@@ -124,7 +124,7 @@ export default async function AuthorPage({
             { label: author.name },
           ]}
         />
-        <section className="flex flex-col gap-6 rounded-3xl border border-neutral-200 bg-white p-8 shadow-sm lg:flex-row lg:items-center">
+        <section className="flex flex-col gap-6 rounded-3xl border border-primary-900/10 bg-white/90 p-8 shadow-soft lg:flex-row lg:items-center">
           {author.avatar && (
             <Image
               src={author.avatar}
@@ -135,7 +135,7 @@ export default async function AuthorPage({
             />
           )}
           <div className="space-y-3">
-            <h1 className="text-3xl font-display font-bold text-neutral-900">{author.name}</h1>
+            <h1 className="text-3xl font-display font-semibold text-primary-900">{author.name}</h1>
             {author.role && <p className="text-neutral-600">{author.role}</p>}
             {author.bio && author.bio.length > 0 && (
               <div className="prose prose-neutral max-w-none text-sm text-neutral-600">
@@ -165,7 +165,7 @@ export default async function AuthorPage({
               ))}
             </div>
           ) : (
-            <div className="rounded-2xl border border-dashed border-neutral-200 p-12 text-center text-neutral-500">
+            <div className="rounded-3xl border border-dashed border-primary-900/20 p-12 text-center text-neutral-500">
               この著者の記事はまだありません。
             </div>
           )}
@@ -177,11 +177,14 @@ export default async function AuthorPage({
         </div>
 
         <section className="space-y-4">
-          <h2 className="text-xl font-semibold text-neutral-900">人気記事</h2>
+          <h2 className="text-xl font-display text-primary-900">人気記事</h2>
           <ul className="grid gap-4 md:grid-cols-2">
             {(popularPosts ?? []).map((post) => (
-              <li key={post._id} className="rounded-2xl border border-neutral-200 p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-soft">
-                <Link href={`/blog/${post.slug}`} className="text-base font-medium text-neutral-900 hover:text-primary-600">
+              <li
+                key={post._id}
+                className="rounded-3xl border border-primary-900/10 bg-white/90 p-5 shadow-soft transition hover:-translate-y-1 hover:shadow-[0_22px_40px_-30px_rgba(26,38,49,0.35)]"
+              >
+                <Link href={`/blog/${post.slug}`} className="text-base font-medium text-primary-800 hover:text-primary-600">
                   {post.title}
                 </Link>
               </li>
