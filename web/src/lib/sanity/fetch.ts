@@ -9,11 +9,9 @@ export type SanityFetchOptions = {
 };
 
 function normalize(value: unknown): unknown {
-  if (value === undefined) return undefined;
+  if (value === undefined) return null;
   if (Array.isArray(value)) {
-    return value
-      .map(normalize)
-      .filter((item) => item !== undefined);
+    return value.map(normalize);
   }
   if (value && typeof value === "object") {
     return Object.fromEntries(
