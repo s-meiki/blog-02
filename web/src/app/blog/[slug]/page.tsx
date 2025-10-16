@@ -2,6 +2,8 @@ import { notFound } from "next/navigation";
 import Script from "next/script";
 
 import Image from "next/image";
+import { draftMode } from "next/headers";
+import { unstable_noStore as noStore } from "next/cache";
 
 import { Breadcrumbs } from "@/components/blog/breadcrumbs";
 import { TableOfContents } from "@/components/blog/toc";
@@ -33,6 +35,9 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
+  if (draftMode().isEnabled) {
+    noStore();
+  }
   const post = await sanityFetch<PostDetail | null>(singlePostQuery, { slug }, { revalidate: 60, tags: ["post", `post:${slug}`] });
   if (!post) {
     return {
@@ -86,6 +91,9 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function PostPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
+  if (draftMode().isEnabled) {
+    noStore();
+  }
   const [post, settings, popularPosts] = await Promise.all([
     sanityFetch<PostDetail | null>(singlePostQuery, { slug }, { revalidate: 60, tags: ["post", `post:${slug}`] }),
     getSiteSettings(),

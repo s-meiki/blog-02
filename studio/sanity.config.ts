@@ -2,11 +2,11 @@ import { visionTool } from "@sanity/vision";
 import { deskTool } from "sanity/desk";
 import { defineConfig } from "sanity";
 
-import { structure, canUseAction } from "./structure";
+import { structure, canUseAction, defaultDocumentNode } from "./structure";
 import schemaTypes from "./schemaTypes";
 
-const projectId = process.env.SANITY_PROJECT_ID ?? "";
-const dataset = process.env.SANITY_DATASET ?? "production";
+const projectId = process.env.SANITY_PROJECT_ID || "uxywiuqh";
+const dataset = process.env.SANITY_DATASET || "production";
 
 export default defineConfig({
   name: "blog-studio",
@@ -20,7 +20,7 @@ export default defineConfig({
   plugins: [
     deskTool({
       structure,
-      defaultDocumentNode: (S) => S.document(),
+      defaultDocumentNode,
     }),
     visionTool(),
   ],

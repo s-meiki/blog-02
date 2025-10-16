@@ -1,7 +1,8 @@
 import { cache } from "react";
+import { draftMode } from "next/headers";
 import type { QueryParams } from "@sanity/client";
 
-import { sanityClient } from "./client";
+import { previewSanityClient, sanityClient, usingMockSanityClient } from "./client";
 
 export type SanityFetchOptions = {
   revalidate?: number;
@@ -23,9 +24,8 @@ function normalize(value: unknown): unknown {
   return value;
 }
 
-export const sanityFetch = cache(
+const fetchPublished = cache(
   async <T>(query: string, params: QueryParams = {}, options: SanityFetchOptions = {}) => {
-    // 監視用：undefined があればログで気づけるように
     if (Object.values(params).some((value) => value === undefined)) {
       console.warn("[sanityFetch] params contained undefined", params);
     }
@@ -35,5 +35,35 @@ export const sanityFetch = cache(
     return sanityClient.fetch<T>(query, normalizedParams, {
       next: { revalidate: options.revalidate ?? 60, tags: options.tags },
     });
-  }
+  },
 );
+
+const fetchPreview = async <T>(query: string, params: QueryParams = {}) => {
+  if (Object.values(params).some((value) => value === undefined)) {
+    console.warn("[sanityFetch][preview] params contained undefined", params);
+  }
+
+  const normalizedParams = normalize(params) as QueryParams;
+
+  return previewSanityClient.fetch<T>(query, normalizedParams);
+};
+
+const isDraftModeEnabled = () => {
+  try {
+    return draftMode().isEnabled;
+  } catch {
+    return false;
+  }
+};
+
+export const sanityFetch = async <T>(
+  query: string,
+  params: QueryParams = {},
+  options: SanityFetchOptions = {},
+) => {
+  if (isDraftModeEnabled() && !usingMockSanityClient) {
+    return fetchPreview<T>(query, params);
+  }
+
+  return fetchPublished<T>(query, params, options);
+};

@@ -1,5 +1,3 @@
-import { cache } from "react";
-
 import type { QueryParams } from "@sanity/client";
 
 import { sanityFetch } from "./fetch";
@@ -39,28 +37,25 @@ type ListParams = {
 
 const PAGE_SIZE = 10;
 
-export const getSiteSettings = cache(async () => {
-  return sanityFetch<SiteSettings | null>(siteSettingsQuery, {}, {
+export const getSiteSettings = async () =>
+  sanityFetch<SiteSettings | null>(siteSettingsQuery, {}, {
     revalidate: 3600,
     tags: ["siteSettings"],
   });
-});
 
-export const getLatestPosts = cache(async () => {
-  return sanityFetch<PostListItem[]>(latestPostsQuery, {}, {
+export const getLatestPosts = async () =>
+  sanityFetch<PostListItem[]>(latestPostsQuery, {}, {
     revalidate: 120,
     tags: ["post"],
   });
-});
 
-export const getPopularPosts = cache(async () => {
-  return sanityFetch<PostListItem[]>(popularPostsQuery, {}, {
+export const getPopularPosts = async () =>
+  sanityFetch<PostListItem[]>(popularPostsQuery, {}, {
     revalidate: 600,
     tags: ["post"],
   });
-});
 
-export const getPaginatedPosts = cache(async (params: ListParams = {}) => {
+export const getPaginatedPosts = async (params: ListParams = {}) => {
   const limit = params.limit ?? PAGE_SIZE;
   const page = params.page ?? 1;
   const offset = (page - 1) * limit;
@@ -120,76 +115,67 @@ export const getPaginatedPosts = cache(async (params: ListParams = {}) => {
     limit,
     pageCount: Math.ceil(total / limit),
   };
-});
+};
 
-export const getCategoryBySlug = cache(async (slug: string) =>
+export const getCategoryBySlug = async (slug: string) =>
   sanityFetch<CategoryDetail | null>(
     categoryDetailQuery,
     { slug },
     { revalidate: 3600, tags: ["category", `category:${slug}`] },
-  ),
-);
+  );
 
-export const getTagBySlug = cache(async (slug: string) =>
+export const getTagBySlug = async (slug: string) =>
   sanityFetch<TagDetail | null>(
     tagDetailQuery,
     { slug },
     { revalidate: 3600, tags: ["tag", `tag:${slug}`] },
-  ),
-);
+  );
 
-export const getAuthorBySlug = cache(async (slug: string) =>
+export const getAuthorBySlug = async (slug: string) =>
   sanityFetch<AuthorDetail | null>(
     authorDetailQuery,
     { slug },
     { revalidate: 3600, tags: ["author", `author:${slug}`] },
-  ),
-);
+  );
 
-export const getAllPostsForSitemap = cache(async () =>
+export const getAllPostsForSitemap = async () =>
   sanityFetch<{ slug: string; publishedAt: string; updatedAt?: string }[]>(
     allPublishedPostsForSitemapQuery,
     {},
     { revalidate: 86400, tags: ["post"] },
-  ),
-);
+  );
 
-export const getAllCategories = cache(async () =>
+export const getAllCategories = async () =>
   sanityFetch<{ slug: string }[]>(
     allCategoriesForSitemapQuery,
     {},
     { revalidate: 86400, tags: ["category"] },
-  ),
-);
+  );
 
-export const getAllTags = cache(async () =>
+export const getAllTags = async () =>
   sanityFetch<{ slug: string }[]>(
     allTagsForSitemapQuery,
     {},
     { revalidate: 86400, tags: ["tag"] },
-  ),
-);
+  );
 
-export const getAllAuthors = cache(async () =>
+export const getAllAuthors = async () =>
   sanityFetch<{ slug: string }[]>(
     allAuthorsForSitemapQuery,
     {},
     { revalidate: 86400, tags: ["author"] },
-  ),
-);
+  );
 
-export const getPageBySlug = cache(async (slug: string) =>
+export const getPageBySlug = async (slug: string) =>
   sanityFetch<PageDetail | null>(
     singlePageQuery,
     { slug },
     { revalidate: 3600, tags: ["page", `page:${slug}`] },
-  ),
-);
+  );
 
-export const getAllPages = cache(async () =>
+export const getAllPages = async () =>
   sanityFetch<{ slug: string; updatedAt?: string }[]>(
     allPagesForSitemapQuery,
     {},
     { revalidate: 3600, tags: ["page"] },
-  ),
-);
+  );

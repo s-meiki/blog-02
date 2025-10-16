@@ -104,7 +104,7 @@ export const singlePostQuery = groq`*[_type == "post" && slug.current == $slug][
 
 export const postSlugsQuery = groq`*[_type == "post" && defined(slug.current) && !(_id in path("drafts.**"))]{ "slug": slug.current }`;
 
-export const relatedPostsQuery = groq`*[_type == "post" && defined(slug.current) && !(_id in path("drafts.**")) && publishedAt <= now() && $category in categories[]->slug.current && slug.current != $slug]
+export const relatedPostsQuery = groq`*[_type == "post" && defined(slug.current) && !(_id in path("drafts.**")) && publishedAt <= now() && (!defined($category) || $category in categories[]->slug.current) && slug.current != $slug]
   | order(publishedAt desc)[0...3]{
     _id,
     title,

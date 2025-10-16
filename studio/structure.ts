@@ -1,11 +1,15 @@
-import type { StructureResolver } from "sanity/desk";
+import type { DefaultDocumentNodeResolver, StructureResolver } from "sanity/desk";
 import { FiSettings } from "react-icons/fi";
+
+import PreviewPane from "./components/PreviewPane";
 
 const singletonTypes = new Set(["siteSettings"]);
 const singletonActions = new Set(["publish", "discardChanges", "restore"]);
+const previewableTypes = new Set(["post", "page"]);
 
 export const structure: StructureResolver = (S) =>
   S.list()
+    .id("content")
     .title("コンテンツ")
     .items([
       S.listItem()
@@ -26,7 +30,16 @@ export const structure: StructureResolver = (S) =>
       S.documentTypeListItem("page").title("固定ページ"),
     ]);
 
-export const defaultDocumentNode = (S: Parameters<StructureResolver>[0]) => S.document();
+export const defaultDocumentNode: DefaultDocumentNodeResolver = (S, { schemaType }) => {
+  if (schemaType && previewableTypes.has(schemaType)) {
+    return S.document().views([
+      S.view.form(),
+      S.view.component(PreviewPane).id("preview").title("プレビュー"),
+    ]);
+  }
+
+  return S.document();
+};
 
 export const canUseAction = ({ schemaType, action }: { schemaType: string; action: string }) => {
   if (!singletonTypes.has(schemaType)) return true;

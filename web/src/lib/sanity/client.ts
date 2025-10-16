@@ -1,11 +1,12 @@
 import { createClient } from "@sanity/client";
-import type { QueryParams } from "@sanity/client";
+import type { QueryParams, ClientConfig } from "@sanity/client";
 
 import { mockSanityFetch } from "./mock-data";
 
-const projectId = process.env.SANITY_PROJECT_ID;
-const dataset = process.env.SANITY_DATASET ?? "production";
+const projectId = process.env.SANITY_PROJECT_ID ?? process.env.NEXT_PUBLIC_SANITY_PROJECT_ID;
+const dataset = process.env.SANITY_DATASET ?? process.env.NEXT_PUBLIC_SANITY_DATASET ?? "production";
 const apiVersion = process.env.SANITY_API_VERSION ?? "2023-10-01";
+const token = process.env.SANITY_READ_TOKEN;
 
 type RealSanityClient = ReturnType<typeof createClient>;
 
@@ -17,12 +18,12 @@ const mockConfig = {
   perspective: "published" as const,
 };
 
-const createMockClient = (): RealSanityClient => {
+const createMockClient = (overrides: Partial<ClientConfig> = {}): RealSanityClient => {
   const client = {
     fetch: <T>(query: string, params: QueryParams = {}) => mockSanityFetch<T>(query, params),
     withConfig: () => client,
-    config: () => mockConfig,
-    clientConfig: mockConfig,
+    config: () => ({ ...mockConfig, ...overrides }),
+    clientConfig: { ...mockConfig, ...overrides },
   };
   return client as unknown as RealSanityClient;
 };
@@ -31,15 +32,33 @@ if (!projectId) {
   console.warn("SANITY_PROJECT_ID が設定されていないため、スタブデータで動作しています。");
 }
 
-export const sanityClient: RealSanityClient = projectId
-  ? createClient({
+const baseConfig: ClientConfig | null = projectId
+  ? {
       projectId,
       dataset,
       apiVersion,
-      useCdn: process.env.NODE_ENV === "production",
+      token,
+      useCdn: !token && process.env.NODE_ENV === "production",
       perspective: "published",
-    })
+    }
+  : null;
+
+const previewConfig: ClientConfig | null = baseConfig
+  ? {
+      ...baseConfig,
+      useCdn: false,
+      perspective: "previewDrafts",
+    }
+  : null;
+
+export const sanityClient: RealSanityClient = baseConfig
+  ? createClient(baseConfig)
   : createMockClient();
 
+export const previewSanityClient: RealSanityClient = previewConfig
+  ? createClient(previewConfig)
+  : createMockClient({ perspective: "previewDrafts" });
+
 export type SanityClient = RealSanityClient;
-export const usingMockSanityClient = !projectId;
+export const usingMockSanityClient = !baseConfig;
+export const hasSanityToken = Boolean(token);

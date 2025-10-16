@@ -7,7 +7,7 @@ const baseConfig = js.configs.recommended;
 export default [
   {
     files: ["**/*.{ts,tsx,js}"],
-    ignores: ["node_modules/**", "dist/**"],
+    ignores: ["node_modules/**", "dist/**", ".sanity/**"],
     languageOptions: {
       parser: tsParser,
       parserOptions: {
@@ -17,6 +17,12 @@ export default [
       globals: {
         ...baseConfig.languageOptions?.globals,
         process: "readonly",
+        window: "readonly",
+        document: "readonly",
+        URL: "readonly",
+        console: "readonly",
+        HTMLFormElement: "readonly",
+        fetch: "readonly",
       },
     },
     plugins: {

@@ -1,5 +1,7 @@
 import Script from "next/script";
 import { notFound } from "next/navigation";
+import { draftMode } from "next/headers";
+import { unstable_noStore as noStore } from "next/cache";
 import type { Metadata } from "next";
 
 import { Breadcrumbs } from "@/components/blog/breadcrumbs";
@@ -38,6 +40,9 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
+  if (draftMode().isEnabled) {
+    noStore();
+  }
   const [page, settings] = await Promise.all([getPageBySlug(slug), getSiteSettings()]);
 
   if (!page) {
@@ -76,6 +81,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function StaticPage({ params }: PageProps) {
   const { slug } = await params;
+  if (draftMode().isEnabled) {
+    noStore();
+  }
   const [page, settings] = await Promise.all([getPageBySlug(slug), getSiteSettings()]);
 
   if (!page) {
