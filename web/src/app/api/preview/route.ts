@@ -45,7 +45,8 @@ export async function GET(request: NextRequest) {
     return new NextResponse("Missing slug for preview", { status: 400 });
   }
 
-  draftMode().enable();
+  const draft = await draftMode();
+  draft.enable();
 
   const redirectUrl = new URL(redirectPath, request.url);
   return NextResponse.redirect(redirectUrl);

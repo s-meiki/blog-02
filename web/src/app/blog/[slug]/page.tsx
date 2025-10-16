@@ -35,7 +35,8 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  if (draftMode().isEnabled) {
+  const { isEnabled } = await draftMode();
+  if (isEnabled) {
     noStore();
   }
   const post = await sanityFetch<PostDetail | null>(singlePostQuery, { slug }, { revalidate: 60, tags: ["post", `post:${slug}`] });
@@ -91,7 +92,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function PostPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  if (draftMode().isEnabled) {
+  const { isEnabled } = await draftMode();
+  if (isEnabled) {
     noStore();
   }
   const [post, settings, popularPosts] = await Promise.all([

@@ -40,7 +40,8 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  if (draftMode().isEnabled) {
+  const { isEnabled } = await draftMode();
+  if (isEnabled) {
     noStore();
   }
   const [page, settings] = await Promise.all([getPageBySlug(slug), getSiteSettings()]);
@@ -81,7 +82,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function StaticPage({ params }: PageProps) {
   const { slug } = await params;
-  if (draftMode().isEnabled) {
+  const { isEnabled } = await draftMode();
+  if (isEnabled) {
     noStore();
   }
   const [page, settings] = await Promise.all([getPageBySlug(slug), getSiteSettings()]);

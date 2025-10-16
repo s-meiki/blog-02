@@ -48,9 +48,10 @@ const fetchPreview = async <T>(query: string, params: QueryParams = {}) => {
   return previewSanityClient.fetch<T>(query, normalizedParams);
 };
 
-const isDraftModeEnabled = () => {
+const isDraftModeEnabled = async () => {
   try {
-    return draftMode().isEnabled;
+    const { isEnabled } = await draftMode();
+    return isEnabled;
   } catch {
     return false;
   }
@@ -61,7 +62,7 @@ export const sanityFetch = async <T>(
   params: QueryParams = {},
   options: SanityFetchOptions = {},
 ) => {
-  if (isDraftModeEnabled() && !usingMockSanityClient) {
+  if ((await isDraftModeEnabled()) && !usingMockSanityClient) {
     return fetchPreview<T>(query, params);
   }
 
