@@ -6,14 +6,12 @@ import { draftMode } from "next/headers";
 import { unstable_noStore as noStore } from "next/cache";
 
 import { Breadcrumbs } from "@/components/blog/breadcrumbs";
-import { TableOfContents } from "@/components/blog/toc";
 import { PostHeader } from "@/components/blog/post-header";
 import { RichTextContent } from "@/components/blog/RichTextContent";
 import { RelatedPosts } from "@/components/blog/post-related";
-import { PostSidebar } from "@/components/blog/post-sidebar";
 import { ShareButtons } from "@/components/blog/share/ShareButtons";
 import { Container } from "@/components/layout/container";
-import { getPopularPosts, getSiteSettings } from "@/lib/sanity/api";
+import { getSiteSettings } from "@/lib/sanity/api";
 import { sanityFetch } from "@/lib/sanity/fetch";
 import {
   postSlugsQuery,
@@ -22,6 +20,7 @@ import {
 } from "@/lib/sanity/queries";
 import type { PostDetail, PostListItem } from "@/lib/sanity/types";
 import { extractHeadingsFromMarkdown, extractHeadings } from "@/lib/utils/headings";
+import { cn } from "@/lib/utils/cn";
 import { buildBlogPostingJsonLd, buildBreadcrumbJsonLd } from "@/lib/structured-data";
 import type { Metadata } from "next";
 
@@ -95,10 +94,9 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
   if (isEnabled) {
     noStore();
   }
-  const [post, settings, popularPosts] = await Promise.all([
+  const [post, settings] = await Promise.all([
     sanityFetch<PostDetail | null>(singlePostQuery, { slug }, { revalidate: 60, tags: ["post", `post:${slug}`] }),
     getSiteSettings(),
-    getPopularPosts(),
   ]);
 
   if (!post) {
@@ -132,9 +130,9 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
         {JSON.stringify(breadcrumbJsonLd)}
       </Script>
       <div className="bg-gradient-to-b from-neutral-100/70 via-neutral-50 to-neutral-100/60 py-16">
-        <Container className="flex flex-col gap-14 lg:flex-row lg:items-start lg:gap-10">
-          <article className="w-full lg:min-w-0">
-            <div className="mx-auto w-full max-w-[960px] space-y-10">
+        <Container className="flex flex-col items-center">
+          <article className="w-full">
+            <div className="mx-auto flex w-full max-w-[900px] flex-col gap-10">
               <Breadcrumbs
                 items={[
                   { label: "ホーム", href: "/" },
@@ -156,6 +154,30 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
                     />
                   </figure>
                 )}
+                {headings.length > 0 && (
+                  <div className="rounded-[24px] border border-neutral-200/80 bg-neutral-50/60 p-6">
+                    <p className="text-xs font-semibold uppercase tracking-[0.3em] text-primary-500">目次</p>
+                    <ul className="mt-4 space-y-2 text-sm text-neutral-600">
+                      {headings.map((heading) => {
+                        const indentClass =
+                          heading.level === 3 ? "ml-4" : heading.level >= 4 ? "ml-8" : "";
+                        return (
+                          <li key={heading.id}>
+                            <a
+                              href={`#${heading.id}`}
+                              className={cn(
+                                "block rounded-lg px-2 py-1 transition hover:bg-primary-50/80 hover:text-primary-700",
+                                indentClass,
+                              )}
+                            >
+                              {heading.text}
+                            </a>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </div>
+                )}
                 <RichTextContent markdown={post.bodyMarkdown} portable={post.body ?? undefined} />
                 <div className="border-t border-dashed border-neutral-200 pt-8">
                   <ShareButtons post={post} />
@@ -164,14 +186,6 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
               <RelatedPosts posts={relatedPosts ?? []} />
             </div>
           </article>
-          <aside className="grid w-full gap-6 lg:w-72 lg:shrink-0">
-            {headings.length > 0 && (
-              <div className="sticky top-28">
-                <TableOfContents headings={headings} />
-              </div>
-            )}
-            <PostSidebar post={post} popularPosts={popularPosts ?? []} />
-          </aside>
         </Container>
       </div>
     </>
