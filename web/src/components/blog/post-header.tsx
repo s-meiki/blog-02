@@ -12,7 +12,7 @@ export const PostHeader = ({ post }: { post: PostDetail }) => (
         {post.title}
       </h1>
     </div>
-    <p className="max-w-2xl text-lg leading-relaxed text-neutral-600">{post.excerpt}</p>
+    <p className="max-w-3xl text-lg leading-relaxed text-neutral-600">{post.excerpt}</p>
     <PostMeta post={post} />
   </header>
 );

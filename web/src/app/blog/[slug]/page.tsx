@@ -134,7 +134,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
       <div className="bg-gradient-to-b from-neutral-100/70 via-neutral-50 to-neutral-100/60 py-16">
         <Container className="flex flex-col gap-14 lg:flex-row lg:items-start lg:gap-10">
           <article className="w-full lg:min-w-0">
-            <div className="mx-auto w-full max-w-3xl space-y-10">
+            <div className="mx-auto w-full max-w-[960px] space-y-10">
               <Breadcrumbs
                 items={[
                   { label: "ホーム", href: "/" },
@@ -142,7 +142,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
                   { label: post.title },
                 ]}
               />
-              <div className="flex flex-col gap-10 rounded-[32px] border border-neutral-200/80 bg-white/95 p-8 shadow-[0_45px_100px_-50px_rgba(30,41,59,0.35)] backdrop-blur-sm sm:p-12">
+              <div className="flex flex-col gap-10 rounded-[32px] border border-neutral-200/80 bg-white/95 p-8 shadow-[0_45px_100px_-50px_rgba(30,41,59,0.35)] backdrop-blur-sm sm:p-12 lg:p-14">
                 <PostHeader post={post} />
                 {post.coverImage?.url && (
                   <figure className="overflow-hidden rounded-[24px]">
