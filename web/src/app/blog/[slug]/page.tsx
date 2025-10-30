@@ -131,38 +131,42 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
       <Script id="breadcrumb-ld-json" type="application/ld+json" strategy="afterInteractive">
         {JSON.stringify(breadcrumbJsonLd)}
       </Script>
-      <div className="py-16">
-        <Container className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_320px]">
-          <article className="space-y-12">
-            <Breadcrumbs
-              items={[
-                { label: "ホーム", href: "/" },
-                { label: "ブログ", href: "/blog" },
-                { label: post.title },
-              ]}
-            />
-            <PostHeader post={post} />
-            {post.coverImage?.url && (
-              <div className="overflow-hidden rounded-3xl">
-                <Image
-                  src={post.coverImage.url}
-                  alt={post.coverImage.alt ?? post.title}
-                  width={1600}
-                  height={900}
-                  className="h-auto w-full object-cover"
-                  priority
-                />
+      <div className="bg-gradient-to-b from-neutral-100/70 via-neutral-50 to-neutral-100/60 py-16">
+        <Container className="flex flex-col gap-14 lg:flex-row lg:items-start lg:gap-10">
+          <article className="w-full lg:min-w-0">
+            <div className="mx-auto w-full max-w-3xl space-y-10">
+              <Breadcrumbs
+                items={[
+                  { label: "ホーム", href: "/" },
+                  { label: "ブログ", href: "/blog" },
+                  { label: post.title },
+                ]}
+              />
+              <div className="flex flex-col gap-10 rounded-[32px] border border-neutral-200/80 bg-white/95 p-8 shadow-[0_45px_100px_-50px_rgba(30,41,59,0.35)] backdrop-blur-sm sm:p-12">
+                <PostHeader post={post} />
+                {post.coverImage?.url && (
+                  <figure className="overflow-hidden rounded-[24px]">
+                    <Image
+                      src={post.coverImage.url}
+                      alt={post.coverImage.alt ?? post.title}
+                      width={1600}
+                      height={900}
+                      className="h-auto w-full object-cover"
+                      priority
+                    />
+                  </figure>
+                )}
+                <RichTextContent markdown={post.bodyMarkdown} portable={post.body ?? undefined} />
+                <div className="border-t border-dashed border-neutral-200 pt-8">
+                  <ShareButtons post={post} />
+                </div>
               </div>
-            )}
-            <div className="space-y-8">
-              <RichTextContent markdown={post.bodyMarkdown} portable={post.body ?? undefined} />
-              <ShareButtons post={post} />
+              <RelatedPosts posts={relatedPosts ?? []} />
             </div>
-            <RelatedPosts posts={relatedPosts ?? []} />
           </article>
-          <aside className="space-y-6">
+          <aside className="grid w-full gap-6 lg:w-72 lg:shrink-0">
             {headings.length > 0 && (
-              <div className="sticky top-24">
+              <div className="sticky top-28">
                 <TableOfContents headings={headings} />
               </div>
             )}
