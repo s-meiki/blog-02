@@ -316,21 +316,35 @@ const MarkdownBody = ({ markdown }: { markdown: string }) => {
         </a>
       );
     },
-    pre: ({ children, className, ...rest }: MarkdownPreProps) => (
-      <pre className={cn("prose-code my-6 overflow-x-auto rounded-xl bg-primary-900/95 p-4 text-sm text-neutral-100", className)} {...rest}>
-        {children}
-      </pre>
-    ),
-    code: ({ inline, className, children, ...props }: MarkdownCodeProps) =>
-      inline ? (
-        <code className={cn("rounded bg-neutral-100 px-1 py-0.5 text-sm text-primary-800", className)} {...props}>
+    pre: (rawProps) => {
+      const { children, className, ...rest } = rawProps as MarkdownPreProps;
+      return (
+        <pre
+          className={cn(
+            "prose-code my-6 overflow-x-auto rounded-xl bg-primary-900/95 p-4 text-sm text-neutral-100",
+            className,
+          )}
+          {...rest}
+        >
+          {children}
+        </pre>
+      );
+    },
+    code: (rawProps) => {
+      const { inline, className, children, ...rest } = rawProps as MarkdownCodeProps;
+      if (inline) {
+        return (
+          <code className={cn("rounded bg-neutral-100 px-1 py-0.5 text-sm text-primary-800", className)} {...rest}>
+            {children}
+          </code>
+        );
+      }
+      return (
+        <code className={className} {...rest}>
           {children}
         </code>
-      ) : (
-        <code className={className} {...props}>
-          {children}
-        </code>
-      ),
+      );
+    },
     blockquote: ({ children }) => (
       <blockquote className="border-l-4 border-primary-200 bg-primary-50/60 p-4 text-neutral-700">{children}</blockquote>
     ),
