@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Facebook, LinkIcon, Share2, Twitter } from "lucide-react";
 
 import type { PostDetail } from "@/lib/sanity/types";
@@ -35,6 +35,13 @@ const legacyCopyToClipboard = (text: string) => {
 export const ShareButtons = ({ post }: { post: PostDetail }) => {
   const origin = typeof window !== "undefined" ? window.location.origin : process.env.NEXT_PUBLIC_SITE_URL;
   const shareUrl = useMemo(() => `${origin ?? ""}/blog/${post.slug}`, [origin, post.slug]);
+  const [canShare, setCanShare] = useState(false);
+
+  useEffect(() => {
+    if (typeof navigator !== "undefined" && typeof navigator.share === "function") {
+      setCanShare(true);
+    }
+  }, []);
 
   const handleCopy = async () => {
     if (typeof window === "undefined") return;
@@ -99,7 +106,7 @@ export const ShareButtons = ({ post }: { post: PostDetail }) => {
         <LinkIcon className="h-4 w-4" />
         コピー
       </button>
-      {typeof navigator !== "undefined" && navigator.share ? (
+      {canShare ? (
         <button
           type="button"
           onClick={() => navigator.share({ title: post.title, url: shareUrl })}
