@@ -1,5 +1,5 @@
 import type { QueryParams } from "@sanity/client";
-import type { PortableTextBlock } from "@portabletext/types";
+import type { PortableTextBlock, PortableTextSpan } from "@portabletext/types";
 
 import {
   allAuthorsForSitemapQuery,
