@@ -4,7 +4,7 @@ import remarkGfm from "remark-gfm";
 import { PortableText, type PortableTextComponents } from "@portabletext/react";
 import type { PortableTextBlock, PortableTextSpan } from "@portabletext/types";
 import { toString } from "mdast-util-to-string";
-import type { ReactNode } from "react";
+import type { HTMLAttributes, ReactNode } from "react";
 import type { Element, Text as HastText } from "hast";
 
 import { urlForImage } from "@/lib/image";
@@ -199,6 +199,14 @@ const createPortableTextComponents = (): PortableTextComponents => {
   };
 };
 
+type MarkdownPreProps = HTMLAttributes<HTMLPreElement> & { className?: string; children?: ReactNode };
+type MarkdownCodeProps = HTMLAttributes<HTMLElement> & {
+  inline?: boolean;
+  className?: string;
+  children?: ReactNode;
+  node?: Element;
+};
+
 const isLikelyTwitterUrl = (candidate: string) => {
   try {
     const url = new URL(candidate);
@@ -308,12 +316,12 @@ const MarkdownBody = ({ markdown }: { markdown: string }) => {
         </a>
       );
     },
-    pre: ({ children, className, ...rest }) => (
+    pre: ({ children, className, ...rest }: MarkdownPreProps) => (
       <pre className={cn("prose-code my-6 overflow-x-auto rounded-xl bg-primary-900/95 p-4 text-sm text-neutral-100", className)} {...rest}>
         {children}
       </pre>
     ),
-    code: ({ inline, className, children, ...props }) =>
+    code: ({ inline, className, children, ...props }: MarkdownCodeProps) =>
       inline ? (
         <code className={cn("rounded bg-neutral-100 px-1 py-0.5 text-sm text-primary-800", className)} {...props}>
           {children}
