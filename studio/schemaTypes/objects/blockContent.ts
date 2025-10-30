@@ -48,5 +48,11 @@ export default defineType({
     defineArrayMember({
       type: "codeBlock",
     }),
+    defineArrayMember({
+      type: "tweetEmbed",
+    }),
+    defineArrayMember({
+      type: "youtubeEmbed",
+    }),
   ],
 });

@@ -5,7 +5,7 @@ import { unstable_noStore as noStore } from "next/cache";
 import type { Metadata } from "next";
 
 import { Breadcrumbs } from "@/components/blog/breadcrumbs";
-import { PostPortableText } from "@/components/blog/portable-text/PostPortableText";
+import { RichTextContent } from "@/components/blog/RichTextContent";
 import { Container } from "@/components/layout/container";
 import { getAllPages, getPageBySlug, getSiteSettings } from "@/lib/sanity/api";
 import { buildBreadcrumbJsonLd } from "@/lib/structured-data";
@@ -119,7 +119,7 @@ export default async function StaticPage({ params }: PageProps) {
             {page.seo?.description && <p className="max-w-2xl text-neutral-600">{page.seo.description}</p>}
           </header>
           <section className="rounded-3xl border border-neutral-200 bg-white p-8 shadow-sm">
-            <PostPortableText value={page.body} />
+            <RichTextContent markdown={page.bodyMarkdown} portable={page.body} />
           </section>
         </Container>
       </div>

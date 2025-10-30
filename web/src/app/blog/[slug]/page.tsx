@@ -8,7 +8,7 @@ import { unstable_noStore as noStore } from "next/cache";
 import { Breadcrumbs } from "@/components/blog/breadcrumbs";
 import { TableOfContents } from "@/components/blog/toc";
 import { PostHeader } from "@/components/blog/post-header";
-import { PostPortableText } from "@/components/blog/portable-text/PostPortableText";
+import { RichTextContent } from "@/components/blog/RichTextContent";
 import { RelatedPosts } from "@/components/blog/post-related";
 import { PostSidebar } from "@/components/blog/post-sidebar";
 import { ShareButtons } from "@/components/blog/share/ShareButtons";
@@ -21,10 +21,9 @@ import {
   singlePostQuery,
 } from "@/lib/sanity/queries";
 import type { PostDetail, PostListItem } from "@/lib/sanity/types";
-import { extractHeadings } from "@/lib/utils/headings";
+import { extractHeadingsFromMarkdown, extractHeadings } from "@/lib/utils/headings";
 import { buildBlogPostingJsonLd, buildBreadcrumbJsonLd } from "@/lib/structured-data";
 import type { Metadata } from "next";
-import type { PortableTextBlock } from "@portabletext/types";
 
 export const revalidate = 60;
 
@@ -112,7 +111,9 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
     { revalidate: 300, tags: ["post"] },
   );
 
-  const headings = extractHeadings(post.body as PortableTextBlock[] | undefined);
+  const headings = post.bodyMarkdown
+    ? extractHeadingsFromMarkdown(post.bodyMarkdown)
+    : extractHeadings(post.body ?? undefined);
   const siteUrl = settings?.siteUrl ?? process.env.NEXT_PUBLIC_SITE_URL;
   const canonical = post.seo?.canonicalUrl ?? (siteUrl ? `${siteUrl}/blog/${post.slug}` : "");
   const structuredData = buildBlogPostingJsonLd(post, settings);
@@ -153,21 +154,20 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
                 />
               </div>
             )}
-            <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_280px]">
-              <div className="space-y-8">
-                <PostPortableText value={post.body} />
-                <ShareButtons post={post} />
-              </div>
-              <div className="sticky top-24 hidden lg:block">
-                <TableOfContents headings={headings} />
-              </div>
+            <div className="space-y-8">
+              <RichTextContent markdown={post.bodyMarkdown} portable={post.body ?? undefined} />
+              <ShareButtons post={post} />
             </div>
             <RelatedPosts posts={relatedPosts ?? []} />
           </article>
-          <div className="space-y-6">
-            <TableOfContents headings={headings} />
+          <aside className="space-y-6">
+            {headings.length > 0 && (
+              <div className="sticky top-24">
+                <TableOfContents headings={headings} />
+              </div>
+            )}
             <PostSidebar post={post} popularPosts={popularPosts ?? []} />
-          </div>
+          </aside>
         </Container>
       </div>
     </>

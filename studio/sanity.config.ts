@@ -1,12 +1,27 @@
-import { visionTool } from "@sanity/vision";
 import { deskTool } from "sanity/desk";
 import { defineConfig } from "sanity";
+import { visionTool } from "@sanity/vision";
+import { markdownSchema } from "sanity-plugin-markdown";
 
 import { structure, canUseAction, defaultDocumentNode } from "./structure";
 import schemaTypes from "./schemaTypes";
 
-const projectId = process.env.SANITY_PROJECT_ID || "uxywiuqh";
-const dataset = process.env.SANITY_DATASET || "production";
+const importMetaEnv =
+  (import.meta as ImportMeta & {
+    env?: Record<string, string | undefined>;
+  }).env ?? {};
+
+const projectId =
+  process.env.SANITY_PROJECT_ID ??
+  importMetaEnv.SANITY_STUDIO_PROJECT_ID ??
+  importMetaEnv.SANITY_PROJECT_ID;
+const dataset =
+  process.env.SANITY_DATASET ??
+  importMetaEnv.SANITY_STUDIO_DATASET ??
+  importMetaEnv.SANITY_DATASET;
+
+if (!projectId) throw new Error("Missing SANITY_PROJECT_ID for Studio");
+if (!dataset) throw new Error("Missing SANITY_DATASET for Studio");
 
 export default defineConfig({
   name: "blog-studio",
@@ -23,6 +38,7 @@ export default defineConfig({
       defaultDocumentNode,
     }),
     visionTool(),
+    markdownSchema(),
   ],
   document: {
     actions: (prev, context) =>
@@ -30,7 +46,7 @@ export default defineConfig({
         canUseAction({
           schemaType: context.schemaType,
           action: actionItem.action || actionItem.name || "",
-        })
+        }),
       ),
   },
 });

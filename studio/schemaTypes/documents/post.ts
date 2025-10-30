@@ -46,10 +46,45 @@ export default defineType({
       validation: (rule) => rule.required(),
     }),
     defineField({
-      name: "body",
+      name: "bodyMarkdown",
       title: "本文",
+      type: "markdown",
+      description:
+        "Markdown形式で本文を編集します。エディタ右下のアイコンでプレビュー表示に切り替えられます。",
+      options: {
+        preview: true,
+        imageUrl: (asset) => `${asset.url}?w=1200`,
+      },
+      validation: (rule) =>
+        rule.custom((value, context) => {
+          const document = context.document as { body?: unknown[] | null };
+          const hasLegacy = Array.isArray(document?.body) && document.body.length > 0;
+          if (typeof value === "string" && value.trim().length > 0) {
+            return true;
+          }
+          if (hasLegacy) {
+            return true;
+          }
+          return "本文を入力してください。";
+        }),
+    }),
+    defineField({
+      name: "body",
+      title: "本文（旧リッチテキスト）",
       type: "blockContent",
-      validation: (rule) => rule.required(),
+      description: "過去の記事でリッチテキスト保存された本文です。必要に応じてMarkdown欄へコピーしてください。",
+      readOnly: true,
+      options: {
+        collapsible: true,
+        collapsed: true,
+      },
+      hidden: ({ document }) => {
+        const legacyBody = (document as { body?: unknown[] | null } | undefined)?.body;
+        if (Array.isArray(legacyBody)) {
+          return legacyBody.length === 0;
+        }
+        return !legacyBody;
+      },
     }),
     defineField({
       name: "publishedAt",

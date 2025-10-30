@@ -49,7 +49,8 @@ export type PostListItem = {
 
 export type PostDetail = PostListItem & {
   updatedAt?: string;
-  body: PortableTextBlock[];
+  body?: PortableTextBlock[] | null;
+  bodyMarkdown?: string | null;
   featured?: boolean;
   seo?: SeoMetadata;
 };
@@ -79,7 +80,7 @@ export type AuthorDetail = AuthorSummary & {
 export type PageDetail = {
   title: string;
   slug: string;
-  body: PortableTextBlock[];
+  body?: PortableTextBlock[] | null;
+  bodyMarkdown?: string | null;
   seo?: SeoMetadata;
 };
-

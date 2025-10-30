@@ -63,6 +63,31 @@ const createPortableTextBlock = (() => {
   };
 })();
 
+const blocksToMarkdown = (blocks: PortableTextBlock[]): string =>
+  blocks
+    .map((block) => {
+      if (block._type !== "block") return "";
+      const text = (block.children as PortableTextSpan[] | undefined)?.map((child) => child.text).join("") ?? "";
+      if (!text.trim()) return "";
+      switch (block.style) {
+        case "h2":
+          return `## ${text.trim()}`;
+        case "h3":
+          return `### ${text.trim()}`;
+        case "h4":
+          return `#### ${text.trim()}`;
+        case "blockquote":
+          return text
+            .split("\n")
+            .map((line) => `> ${line}`)
+            .join("\n");
+        default:
+          return text.trim();
+      }
+    })
+    .filter((segment) => segment.length > 0)
+    .join("\n\n");
+
 const mockSiteSettings: SiteSettings = {
   siteTitle: "Sanity Blog Demo",
   siteDescription: "Sanity と Next.js で構築したブログのデモデータです。",
@@ -143,16 +168,25 @@ const mockTags: TagDetail[] = [
   { title: "Productivity", slug: "productivity" },
 ];
 
+const aboutPageBody = [
+  createPortableTextBlock("Sanity Blog Demo では、Sanity をヘッドレス CMS として活用したワークフローを紹介しています。"),
+  createPortableTextBlock("このデモは開発環境向けのスタブデータで動作しており、実際の Sanity プロジェクトがなくても UI を確認できます。"),
+  createPortableTextBlock("ミッション", "h2"),
+  createPortableTextBlock("開発者が素早くコンテンツ体験を検証できる環境を提供すること。"),
+];
+
+const contactPageBody = [
+  createPortableTextBlock("ご意見やお問い合わせは下記メールアドレスまでご連絡ください。"),
+  createPortableTextBlock("hello@example.com", "h3"),
+  createPortableTextBlock("通常 2 営業日以内に返信いたします。"),
+];
+
 const mockPages: PageDetailWithMeta[] = [
   {
     title: "About",
     slug: "about",
-    body: [
-      createPortableTextBlock("Sanity Blog Demo では、Sanity をヘッドレス CMS として活用したワークフローを紹介しています。"),
-      createPortableTextBlock("このデモは開発環境向けのスタブデータで動作しており、実際の Sanity プロジェクトがなくても UI を確認できます。"),
-      createPortableTextBlock("ミッション", "h2"),
-      createPortableTextBlock("開発者が素早くコンテンツ体験を検証できる環境を提供すること。"),
-    ],
+    body: aboutPageBody,
+    bodyMarkdown: blocksToMarkdown(aboutPageBody),
     seo: {
       title: "About - Sanity Blog Demo",
       description: "Sanity Blog Demo のコンセプトとチーム紹介",
@@ -162,11 +196,8 @@ const mockPages: PageDetailWithMeta[] = [
   {
     title: "Contact",
     slug: "contact",
-    body: [
-      createPortableTextBlock("ご意見やお問い合わせは下記メールアドレスまでご連絡ください。"),
-      createPortableTextBlock("hello@example.com", "h3"),
-      createPortableTextBlock("通常 2 営業日以内に返信いたします。"),
-    ],
+    body: contactPageBody,
+    bodyMarkdown: blocksToMarkdown(contactPageBody),
     seo: {
       title: "Contact",
       description: "Sanity Blog Demo へのお問い合わせ窓口",
@@ -189,6 +220,34 @@ const toListItem = (post: PostDetail): PostListItem => ({
   popularScore: post.popularScore,
 });
 
+const post001Body = [
+  createPortableTextBlock("Sanity を活用することで、開発者体験と編集者体験の両方を高められます。"),
+  createPortableTextBlock("セットアップ手順", "h2"),
+  createPortableTextBlock("1. create-next-app でプロジェクトを作成します。"),
+  createPortableTextBlock("2. Sanity Studio を /studio ディレクトリに追加し、スキーマを定義します。"),
+  createPortableTextBlock("3. ISR と Webhook を設定して公開フローを整えましょう。"),
+  createPortableTextBlock("実装のポイント", "h2"),
+  createPortableTextBlock("Portable Text を用いることで、記事本文にリッチな表現を加えられます。"),
+  createPortableTextBlock("テーマカスタマイズ", "h3"),
+  createPortableTextBlock("Tailwind CSS でダークブルーを基調としたテーマを構築します。"),
+];
+
+const post002Body = [
+  createPortableTextBlock("Sanity Studio は編集者ごとに最適化されたカスタムビューを構築できます。"),
+  createPortableTextBlock("Desk Structure の設計", "h2"),
+  createPortableTextBlock("カテゴリやタグの一覧をすぐに開けるようにすることで、編集効率が向上します。"),
+  createPortableTextBlock("入力支援", "h3"),
+  createPortableTextBlock("バリデーションや初期値を設定し、迷いなく記事を作成できるようにしましょう。"),
+];
+
+const post003Body = [
+  createPortableTextBlock("公開フローを自動化することで、コンテンツの鮮度を保ちやすくなります。"),
+  createPortableTextBlock("ワークフロー構築", "h2"),
+  createPortableTextBlock("Sanity Webhook を使って Vercel の ISR 再検証を自動化します。"),
+  createPortableTextBlock("チームコラボレーション", "h3"),
+  createPortableTextBlock("レビューや承認ステップをスプレッドシートではなく、Studio 内で完結させましょう。"),
+];
+
 const mockPosts: PostDetail[] = [
   {
     _id: "mock-post-001",
@@ -204,17 +263,8 @@ const mockPosts: PostDetail[] = [
     ],
     tags: ["nextjs", "sanity", "tailwind"],
     popularScore: 98,
-    body: [
-      createPortableTextBlock("Sanity を活用することで、開発者体験と編集者体験の両方を高められます。"),
-      createPortableTextBlock("セットアップ手順", "h2"),
-      createPortableTextBlock("1. create-next-app でプロジェクトを作成します。"),
-      createPortableTextBlock("2. Sanity Studio を /studio ディレクトリに追加し、スキーマを定義します。"),
-      createPortableTextBlock("3. ISR と Webhook を設定して公開フローを整えましょう。"),
-      createPortableTextBlock("実装のポイント", "h2"),
-      createPortableTextBlock("Portable Text を用いることで、記事本文にリッチな表現を加えられます。"),
-      createPortableTextBlock("テーマカスタマイズ", "h3"),
-      createPortableTextBlock("Tailwind CSS でダークブルーを基調としたテーマを構築します。"),
-    ],
+    body: post001Body,
+    bodyMarkdown: blocksToMarkdown(post001Body),
   },
   {
     _id: "mock-post-002",
@@ -230,13 +280,8 @@ const mockPosts: PostDetail[] = [
     ],
     tags: ["sanity", "ui-ux"],
     popularScore: 87,
-    body: [
-      createPortableTextBlock("Sanity Studio は編集者ごとに最適化されたカスタムビューを構築できます。"),
-      createPortableTextBlock("Desk Structure の設計", "h2"),
-      createPortableTextBlock("カテゴリやタグの一覧をすぐに開けるようにすることで、編集効率が向上します。"),
-      createPortableTextBlock("入力支援", "h3"),
-      createPortableTextBlock("バリデーションや初期値を設定し、迷いなく記事を作成できるようにしましょう。"),
-    ],
+    body: post002Body,
+    bodyMarkdown: blocksToMarkdown(post002Body),
   },
   {
     _id: "mock-post-003",
@@ -252,13 +297,8 @@ const mockPosts: PostDetail[] = [
     ],
     tags: ["productivity", "nextjs"],
     popularScore: 76,
-    body: [
-      createPortableTextBlock("公開フローを自動化することで、コンテンツの鮮度を保ちやすくなります。"),
-      createPortableTextBlock("ワークフロー構築", "h2"),
-      createPortableTextBlock("Sanity Webhook を使って Vercel の ISR 再検証を自動化します。"),
-      createPortableTextBlock("チームコラボレーション", "h3"),
-      createPortableTextBlock("レビューや承認ステップをスプレッドシートではなく、Studio 内で完結させましょう。"),
-    ],
+    body: post003Body,
+    bodyMarkdown: blocksToMarkdown(post003Body),
   },
 ];
 

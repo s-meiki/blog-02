@@ -44,7 +44,10 @@ export const TableOfContents = ({ headings }: { headings: HeadingItem[] }) => {
   if (!headings.length) return null;
 
   return (
-    <nav className="rounded-3xl border border-primary-900/10 bg-white/90 p-6 shadow-soft">
+    <nav
+      className="rounded-3xl border border-primary-900/10 bg-white/90 p-6 shadow-soft lg:max-h-[70vh] lg:overflow-y-auto"
+      aria-label="記事の目次"
+    >
       <p className="text-xs font-semibold uppercase tracking-[0.3em] text-primary-500">目次</p>
       <ul className="mt-4 space-y-2 text-sm text-neutral-600">
         {headings.map((heading) => (

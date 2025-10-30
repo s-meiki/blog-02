@@ -81,6 +81,7 @@ export const singlePostQuery = groq`*[_type == "post" && slug.current == $slug][
   "slug": slug.current,
   excerpt,
   body,
+  bodyMarkdown,
   publishedAt,
   updatedAt,
   readingTime,
@@ -163,6 +164,7 @@ export const singlePageQuery = groq`*[_type == "page" && slug.current == $slug][
   title,
   "slug": slug.current,
   body,
+  bodyMarkdown,
   seo,
 }`;
 

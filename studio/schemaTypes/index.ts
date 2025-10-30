@@ -8,6 +8,8 @@ import seo from "./objects/seo";
 import blockContent from "./objects/blockContent";
 import imageWithCaption from "./objects/imageWithCaption";
 import codeBlock from "./objects/codeBlock";
+import tweetEmbed from "./objects/tweetEmbed";
+import youtubeEmbed from "./objects/youtubeEmbed";
 
 const schemaTypes = [
   post,
@@ -20,6 +22,8 @@ const schemaTypes = [
   blockContent,
   imageWithCaption,
   codeBlock,
+  tweetEmbed,
+  youtubeEmbed,
 ];
 
 export default schemaTypes;

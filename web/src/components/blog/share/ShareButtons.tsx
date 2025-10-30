@@ -14,17 +14,49 @@ const openWindow = (url: string) => {
   window.open(url, "_blank", "noopener,noreferrer,width=600,height=600");
 };
 
+const legacyCopyToClipboard = (text: string) => {
+  try {
+    const textarea = document.createElement("textarea");
+    textarea.value = text;
+    textarea.setAttribute("readonly", "");
+    textarea.style.position = "absolute";
+    textarea.style.left = "-9999px";
+    document.body.appendChild(textarea);
+    textarea.select();
+    const succeeded = document.execCommand("copy");
+    document.body.removeChild(textarea);
+    return succeeded;
+  } catch (error) {
+    console.error("Legacy copy failed", error);
+    return false;
+  }
+};
+
 export const ShareButtons = ({ post }: { post: PostDetail }) => {
   const origin = typeof window !== "undefined" ? window.location.origin : process.env.NEXT_PUBLIC_SITE_URL;
   const shareUrl = useMemo(() => `${origin ?? ""}/blog/${post.slug}`, [origin, post.slug]);
 
   const handleCopy = async () => {
-    if (typeof navigator === "undefined") return;
+    if (typeof window === "undefined") return;
+    const fallback = () => {
+      if (legacyCopyToClipboard(shareUrl)) {
+        alert("リンクをコピーしました");
+      } else {
+        alert("この環境ではコピーできません。手動で URL をコピーしてください。");
+      }
+    };
+
+    if (!window.isSecureContext || typeof navigator === "undefined" || !navigator.clipboard?.writeText) {
+      fallback();
+      return;
+    }
+
     try {
       await navigator.clipboard.writeText(shareUrl);
       alert("リンクをコピーしました");
     } catch (error) {
-      console.error("Failed to copy", error);
+      console.warn("Clipboard API not available, fallback to legacy copy.", error);
+      fallback();
     }
   };
 
