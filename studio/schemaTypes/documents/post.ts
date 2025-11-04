@@ -1,8 +1,6 @@
 import { defineField, defineType } from "sanity";
 import { isUniqueAcrossAllDocuments } from "../../lib/isUnique";
 
-const DEFAULT_AUTHOR_ID = "author-meiki";
-
 export default defineType({
   name: "post",
   title: "記事",
@@ -111,9 +109,19 @@ export default defineType({
       title: "著者",
       type: "reference",
       to: [{ type: "author" }],
-      initialValue: {
-        _type: "reference",
-        _ref: DEFAULT_AUTHOR_ID,
+      initialValue: async (context) => {
+        const authorId =
+          (await context.client.fetch<string | null>(
+            `*[_type == "author" && (slug.current == $slug || name == $name)][0]._id`,
+            { slug: "meiki", name: "meiki" },
+          )) ?? null;
+
+        if (!authorId) return undefined;
+
+        return {
+          _type: "reference",
+          _ref: authorId,
+        };
       },
       validation: (rule) => rule.required(),
     }),
@@ -176,10 +184,4 @@ export default defineType({
       by: [{ field: "popularScore", direction: "desc" }],
     },
   ],
-  initialValue: {
-    author: {
-      _type: "reference",
-      _ref: DEFAULT_AUTHOR_ID,
-    },
-  },
 });
