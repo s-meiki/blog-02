@@ -109,7 +109,26 @@ export default defineType({
       title: "著者",
       type: "reference",
       to: [{ type: "author" }],
-      initialValue: undefined,
+      initialValue: async ({ getClient }) => {
+        try {
+          const client = getClient({ apiVersion: "2023-10-01" });
+          const authorId =
+            (await client.fetch<string | null>(
+              `*[_type == "author" && (slug.current == $slug || name == $name)][0]._id`,
+              { slug: "meiki", name: "meiki" },
+            )) ?? null;
+
+          if (!authorId) return undefined;
+
+          return {
+            _type: "reference",
+            _ref: authorId,
+          };
+        } catch (error) {
+          console.warn("Failed to resolve default author", error);
+          return undefined;
+        }
+      },
       validation: (rule) => rule.required(),
     }),
     defineField({
