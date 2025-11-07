@@ -1,8 +1,16 @@
+import Image from "next/image";
 import Link from "next/link";
 
 import { Container } from "./container";
+import type { PostListItem } from "@/lib/sanity/types";
 
-export const Hero = ({ title, description }: { title: string; description: string }) => (
+type HeroProps = {
+  title: string;
+  description: string;
+  featuredPost?: PostListItem | null;
+};
+
+export const Hero = ({ title, description, featuredPost }: HeroProps) => (
   <section className="relative overflow-hidden py-20 sm:py-24">
     <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary-900/8 via-transparent to-accent-200/30" />
     <Container className="relative flex flex-col gap-14 lg:flex-row lg:items-center">
@@ -11,7 +19,7 @@ export const Hero = ({ title, description }: { title: string; description: strin
           <span className="h-px w-12 bg-accent-400" />
           Journal
         </span>
-        <h1 className="text-4xl font-display font-semibold text-primary-900 sm:text-5xl">
+        <h1 className="text-4xl font-display font-semibold leading-tight text-primary-900 sm:text-5xl">
           {title}
         </h1>
         <p className="max-w-xl text-lg text-neutral-600">{description}</p>
@@ -31,18 +39,65 @@ export const Hero = ({ title, description }: { title: string; description: strin
         </div>
       </div>
 
-      <div className="grid w-full gap-6 sm:grid-cols-3 lg:w-auto">
-        {[
-          { label: "公開記事", value: "120+" },
-          { label: "購読者", value: "8,500" },
-          { label: "更新頻度", value: "Weekly" },
-        ].map((item) => (
-          <div key={item.label} className="rounded-2xl border border-primary-900/5 bg-white/70 px-6 py-5 shadow-soft backdrop-blur">
-            <p className="text-xs font-medium uppercase tracking-[0.3em] text-primary-500">{item.label}</p>
-            <p className="mt-3 font-display text-2xl text-primary-800">{item.value}</p>
+      {featuredPost ? (
+        <Link
+          href={`/blog/${featuredPost.slug}`}
+          className="group w-full max-w-xl rounded-[32px] border border-white/40 bg-white/80 p-6 shadow-[0_35px_80px_-40px_rgba(15,23,42,0.55)] backdrop-blur-lg transition-transform duration-300 hover:-translate-y-1"
+        >
+          {featuredPost.coverImage?.url && (
+            <div className="relative h-56 w-full overflow-hidden rounded-3xl">
+              <Image
+                src={featuredPost.coverImage.url}
+                alt={featuredPost.coverImage.alt ?? featuredPost.title}
+                fill
+                className="object-cover transition-transform duration-500 group-hover:scale-105"
+                sizes="(max-width: 768px) 100vw, 480px"
+              />
+            </div>
+          )}
+          <div className="mt-6 space-y-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.35em] text-primary-500">
+              {featuredPost.categories?.[0]?.title ?? "Featured"}
+            </p>
+            <h3 className="text-2xl font-display font-semibold text-primary-900">
+              {featuredPost.title}
+            </h3>
+            <p className="text-sm text-neutral-600 line-clamp-3">{featuredPost.excerpt}</p>
+            <span className="inline-flex items-center gap-2 text-sm font-semibold text-primary-700">
+              記事を読む
+              <svg
+                viewBox="0 0 24 24"
+                className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1"
+                aria-hidden="true"
+              >
+                <path
+                  d="M5 12h14M13 6l6 6-6 6"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </span>
           </div>
-        ))}
-      </div>
+        </Link>
+      ) : (
+        <div className="grid w-full gap-6 sm:grid-cols-3 lg:w-auto">
+          {[
+            { label: "公開記事", value: "120+" },
+            { label: "購読者", value: "8,500" },
+            { label: "更新頻度", value: "Weekly" },
+          ].map((item) => (
+            <div
+              key={item.label}
+              className="rounded-2xl border border-primary-900/5 bg-white/70 px-6 py-5 shadow-soft backdrop-blur"
+            >
+              <p className="text-xs font-medium uppercase tracking-[0.3em] text-primary-500">{item.label}</p>
+              <p className="mt-3 font-display text-2xl text-primary-800">{item.value}</p>
+            </div>
+          ))}
+        </div>
+      )}
     </Container>
   </section>
 );
