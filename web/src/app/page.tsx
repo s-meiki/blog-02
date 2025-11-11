@@ -1,63 +1,90 @@
 import { ArticleCard } from "@/components/blog/article-card";
 import Link from "next/link";
-
-import { ArticleCard } from "@/components/blog/article-card";
 import { PopularPosts } from "@/components/blog/popular-posts";
 import { Container } from "@/components/layout/container";
 import { Hero } from "@/components/layout/hero";
-import { getLatestPosts, getPopularPosts, getSiteSettings } from "@/lib/sanity/api";
+import {
+  getCategoryHighlights,
+  getLatestPosts,
+  getPopularPosts,
+  getSiteSettings,
+  getTrendingTags,
+} from "@/lib/sanity/api";
+
+export const revalidate = 120;
 
 export default async function HomePage() {
-  const [settings, latestPosts, popularPosts] = await Promise.all([
+  const [settings, latestPosts, popularPosts, categoryHighlights, trendingTags] = await Promise.all([
     getSiteSettings(),
     getLatestPosts(),
     getPopularPosts(),
+    getCategoryHighlights(),
+    getTrendingTags(),
   ]);
 
   const featuredPost = latestPosts?.[0] ?? null;
   const latestGridPosts = featuredPost ? latestPosts?.slice(1, 7) ?? [] : latestPosts ?? [];
+  const topTags = trendingTags ?? [];
+  const highlightedCategories = categoryHighlights ?? [];
 
-  const tags = Array.from(
-    new Set(
-      (latestPosts ?? [])
-        .flatMap((post) => post.tags ?? [])
-        .filter((tag): tag is string => Boolean(tag && tag.trim())),
-    ),
-  ).slice(0, 10);
+  const heroTitle = settings?.siteTitle ?? "Sanity Blog";
+  const heroDescription =
+    settings?.siteDescription ?? "Sanity と Next.js、Tailwind CSS で構築したモダンなブログプラットフォーム";
+  const heroSettings = settings?.hero;
+  const siteUrl = settings?.siteUrl ?? process.env.NEXT_PUBLIC_SITE_URL;
 
-  const categoryHighlights = (() => {
-    const map = new Map<
-      string,
-      {
-        title: string;
-        slug: string;
-        excerpt: string;
-      }
-    >();
+  const structuredData: Array<Record<string, unknown>> = [
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      name: heroTitle,
+      description: heroDescription,
+      ...(siteUrl ? { url: siteUrl } : {}),
+      ...(siteUrl
+        ? {
+            potentialAction: {
+              "@type": "SearchAction",
+              target: `${siteUrl}/blog?q={search_term_string}`,
+              "query-input": "required name=search_term_string",
+            },
+          }
+        : {}),
+    },
+  ];
 
-    (latestPosts ?? []).forEach((post) => {
-      post.categories?.forEach((category) => {
-        if (!category?.slug || map.has(category.slug)) return;
-        map.set(category.slug, {
-          title: category.title,
-          slug: category.slug,
-          excerpt: post.excerpt,
-        });
-      });
+  if (siteUrl) {
+    structuredData.push({
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        {
+          "@type": "ListItem",
+          position: 1,
+          name: heroTitle,
+          item: siteUrl,
+        },
+      ],
     });
-
-    return Array.from(map.values()).slice(0, 3);
-  })();
+  }
 
   return (
     <div className="space-y-0">
+      {structuredData.length > 0 && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(structuredData, null, 2),
+          }}
+        />
+      )}
       <Hero
-        title={settings?.siteTitle ?? "Sanity Blog"}
-        description={
-          settings?.siteDescription ??
-          "Sanity と Next.js、Tailwind CSS で構築したモダンなブログプラットフォーム"
-        }
+        title={heroTitle}
+        description={heroDescription}
         featuredPost={featuredPost}
+        eyebrow={heroSettings?.eyebrow ?? undefined}
+        primaryCta={heroSettings?.primaryCta ?? undefined}
+        secondaryCta={heroSettings?.secondaryCta ?? undefined}
+        metrics={heroSettings?.metrics ?? undefined}
       />
 
       <div className="bg-neutral-50/60">
@@ -82,7 +109,7 @@ export default async function HomePage() {
             </div>
           </section>
 
-          {tags.length > 0 && (
+          {topTags.length > 0 && (
             <section className="rounded-[32px] border border-primary-900/10 bg-primary-900 text-white">
               <div className="grid gap-6 p-8 sm:p-10 lg:grid-cols-[280px_minmax(0,1fr)] lg:items-center">
                 <div className="space-y-3">
@@ -92,14 +119,16 @@ export default async function HomePage() {
                     最近よく読まれているタグをピックアップしました。気になるテーマをクリックして記事を探してみてください。
                   </p>
                 </div>
-                <div className="flex flex-wrap gap-3">
-                  {tags.map((tag) => (
+                <div className="flex flex-wrap gap-3" aria-label="人気のタグ">
+                  {topTags.map((tag) => (
                     <Link
-                      key={tag}
-                      href={`/tag/${encodeURIComponent(tag)}`}
-                      className="inline-flex items-center rounded-full border border-white/30 bg-white/10 px-4 py-2 text-sm font-medium text-white/90 backdrop-blur transition hover:bg-white/20"
+                      key={tag.name}
+                      href={`/tag/${encodeURIComponent(tag.name)}`}
+                      className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-4 py-2 text-sm font-medium text-white/90 backdrop-blur transition hover:bg-white/20"
+                      aria-label={`${tag.name}のタグ一覧 (${tag.count}件の記事)`}
                     >
-                      #{tag}
+                      #{tag.name}
+                      <span className="rounded-full bg-white/20 px-2 py-0.5 text-xs text-white/80">{tag.count}</span>
                     </Link>
                   ))}
                 </div>
@@ -107,7 +136,7 @@ export default async function HomePage() {
             </section>
           )}
 
-          {categoryHighlights.length > 0 && (
+          {highlightedCategories.length > 0 ? (
             <section className="space-y-6">
               <div className="flex flex-col gap-2">
                 <p className="text-xs font-semibold uppercase tracking-[0.35em] text-primary-500">Collections</p>
@@ -115,36 +144,49 @@ export default async function HomePage() {
                 <p className="text-neutral-600">学びたい領域にあわせて記事をまとめました。</p>
               </div>
               <div className="grid gap-6 lg:grid-cols-3">
-                {categoryHighlights.map((category) => (
-                  <Link
-                    key={category.slug}
-                    href={`/category/${category.slug}`}
-                    className="group flex h-full flex-col gap-4 rounded-[28px] border border-neutral-200 bg-white p-6 shadow-soft transition hover:-translate-y-1 hover:shadow-[0_28px_60px_-40px_rgba(15,23,42,0.35)]"
-                  >
-                    <p className="text-xs font-semibold uppercase tracking-[0.35em] text-primary-500">
-                      Category
-                    </p>
-                    <h3 className="text-2xl font-display font-semibold text-primary-900">{category.title}</h3>
-                    <p className="line-clamp-3 text-sm text-neutral-600">{category.excerpt}</p>
-                    <span className="mt-auto inline-flex items-center gap-2 text-sm font-semibold text-primary-700">
-                      記事一覧へ
-                      <svg
-                        viewBox="0 0 24 24"
-                        className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1"
-                        aria-hidden="true"
-                      >
-                        <path
-                          d="M5 12h14M13 6l6 6-6 6"
-                          stroke="currentColor"
-                          strokeWidth="1.5"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    </span>
-                  </Link>
-                ))}
+                {highlightedCategories.map((category) => {
+                  const description = category.description ?? category.featuredPost?.excerpt ?? "関連記事を集めました。";
+                  return (
+                    <Link
+                      key={category.slug}
+                      href={`/category/${category.slug}`}
+                      className="group flex h-full flex-col gap-4 rounded-[28px] border border-neutral-200 bg-white p-6 shadow-soft transition hover:-translate-y-1 hover:shadow-[0_28px_60px_-40px_rgba(15,23,42,0.35)]"
+                      aria-label={`${category.title}カテゴリーの記事一覧 (${category.postCount}件)`}
+                    >
+                      <p className="text-xs font-semibold uppercase tracking-[0.35em] text-primary-500">
+                        Category
+                      </p>
+                      <div className="space-y-2">
+                        <h3 className="text-2xl font-display font-semibold text-primary-900">{category.title}</h3>
+                        <p className="line-clamp-3 text-sm text-neutral-600">{description}</p>
+                      </div>
+                      <div className="mt-auto flex items-center justify-between text-sm font-semibold text-primary-700">
+                        <span className="inline-flex items-center gap-2">
+                          記事一覧へ
+                          <svg
+                            viewBox="0 0 24 24"
+                            className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1"
+                            aria-hidden="true"
+                          >
+                            <path
+                              d="M5 12h14M13 6l6 6-6 6"
+                              stroke="currentColor"
+                              strokeWidth="1.5"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                          </svg>
+                        </span>
+                        <span className="text-xs font-medium text-primary-500/80">{category.postCount}件</span>
+                      </div>
+                    </Link>
+                  );
+                })}
               </div>
+            </section>
+          ) : (
+            <section className="rounded-[28px] border border-dashed border-primary-900/20 bg-white/80 p-8 text-center text-sm text-neutral-500">
+              カテゴリ情報を取得できませんでした。Sanity でカテゴリを作成してからご確認ください。
             </section>
           )}
 

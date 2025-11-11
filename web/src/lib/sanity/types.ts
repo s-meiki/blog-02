@@ -33,6 +33,16 @@ export type CategoryDetail = CategorySummary & {
   seo?: SeoMetadata;
 };
 
+export type CategoryHighlight = CategorySummary & {
+  description?: string;
+  postCount: number;
+  featuredPost?: {
+    title: string;
+    slug: string;
+    excerpt?: string;
+  };
+};
+
 export type PostListItem = {
   _id: string;
   title: string;
@@ -55,6 +65,23 @@ export type PostDetail = PostListItem & {
   seo?: SeoMetadata;
 };
 
+export type HeroMetric = {
+  label: string;
+  value: string;
+};
+
+export type HeroCta = {
+  label: string;
+  href: string;
+};
+
+export type HeroSettings = {
+  eyebrow?: string;
+  primaryCta?: HeroCta;
+  secondaryCta?: HeroCta;
+  metrics?: HeroMetric[];
+};
+
 export type SiteSettings = {
   siteTitle: string;
   siteDescription: string;
@@ -65,12 +92,18 @@ export type SiteSettings = {
   navigation?: { label: string; href: string; external?: boolean }[];
   footerLinks?: { label: string; href: string }[];
   socialLinks?: { platform: string; url: string }[];
+  hero?: HeroSettings;
 };
 
 export type TagDetail = {
   title: string;
   slug: string;
   description?: string;
+};
+
+export type TrendingTag = {
+  name: string;
+  count: number;
 };
 
 export type AuthorDetail = AuthorSummary & {

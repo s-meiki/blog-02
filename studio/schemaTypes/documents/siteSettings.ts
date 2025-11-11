@@ -19,6 +19,80 @@ export default defineType({
       validation: (rule) => rule.required().max(160),
     }),
     defineField({
+      name: "hero",
+      title: "ヒーローセクション",
+      type: "object",
+      fields: [
+        defineField({
+          name: "eyebrow",
+          title: "アイキャッチテキスト",
+          type: "string",
+          description: "Hero の小ラベル。例: Journal / Insights など。",
+        }),
+        defineField({
+          name: "primaryCta",
+          title: "メイン CTA",
+          type: "object",
+          fields: [
+            defineField({
+              name: "label",
+              title: "ボタンラベル",
+              type: "string",
+              validation: (rule) => rule.required(),
+            }),
+            defineField({
+              name: "href",
+              title: "リンク先",
+              type: "string",
+              validation: (rule) => rule.required(),
+            }),
+          ],
+        }),
+        defineField({
+          name: "secondaryCta",
+          title: "サブ CTA",
+          type: "object",
+          fields: [
+            defineField({
+              name: "label",
+              title: "ボタンラベル",
+              type: "string",
+            }),
+            defineField({
+              name: "href",
+              title: "リンク先",
+              type: "string",
+            }),
+          ],
+        }),
+        defineField({
+          name: "metrics",
+          title: "メトリクス",
+          type: "array",
+          of: [
+            defineField({
+              name: "metric",
+              type: "object",
+              fields: [
+                defineField({
+                  name: "label",
+                  title: "ラベル",
+                  type: "string",
+                  validation: (rule) => rule.required(),
+                }),
+                defineField({
+                  name: "value",
+                  title: "値",
+                  type: "string",
+                  validation: (rule) => rule.required(),
+                }),
+              ],
+            }),
+          ],
+        }),
+      ],
+    }),
+    defineField({
       name: "siteUrl",
       title: "サイト URL",
       type: "url",

@@ -7,6 +7,21 @@ export const siteSettingsQuery = groq`*[_type == "siteSettings" && _id == "siteS
   contactEmail,
   "logo": logo.asset->url,
   "defaultOgImage": defaultOGImage.asset->url,
+  hero{
+    eyebrow,
+    primaryCta{
+      label,
+      href
+    },
+    secondaryCta{
+      label,
+      href
+    },
+    metrics[]{
+      label,
+      value
+    }
+  },
   navigation[]{label, href, external},
   footerLinks[]{label, href},
   socialLinks[]{platform, url}
@@ -127,12 +142,30 @@ export const categoryDetailQuery = groq`*[_type == "category" && slug.current ==
   seo
 }`;
 
+export const categoryHighlightsQuery = groq`*[_type == "category" && defined(slug.current)]
+  | order(_createdAt desc)[0...6]{
+    title,
+    "slug": slug.current,
+    description,
+    "postCount": count(*[_type == "post" && references(^._id) && !(_id in path("drafts.**")) && defined(slug.current) && publishedAt <= now()]),
+    "featuredPost": *[_type == "post" && references(^._id) && !(_id in path("drafts.**")) && defined(slug.current) && publishedAt <= now()]
+      | order(popularScore desc, publishedAt desc)[0]{
+        title,
+        "slug": slug.current,
+        excerpt
+      }
+  }`;
+
 export const tagSlugsQuery = groq`*[_type == "tag" && defined(slug.current)]{ "slug": slug.current }`;
 
 export const tagDetailQuery = groq`*[_type == "tag" && slug.current == $slug][0]{
   title,
   "slug": slug.current,
   description,
+}`;
+
+export const tagUsageSourceQuery = groq`*[_type == "post" && defined(slug.current) && !(_id in path("drafts.**")) && publishedAt <= now()]{
+  tags
 }`;
 
 export const authorSlugsQuery = groq`*[_type == "author" && defined(slug.current)]{ "slug": slug.current }`;

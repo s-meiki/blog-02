@@ -9,7 +9,9 @@ import {
   popularPostsQuery,
   siteSettingsQuery,
   categoryDetailQuery,
+  categoryHighlightsQuery,
   tagDetailQuery,
+  tagUsageSourceQuery,
   allPublishedPostsForSitemapQuery,
   allCategoriesForSitemapQuery,
   allTagsForSitemapQuery,
@@ -20,10 +22,12 @@ import {
 import type {
   AuthorDetail,
   CategoryDetail,
+  CategoryHighlight,
   PageDetail,
   PostListItem,
   SiteSettings,
   TagDetail,
+  TrendingTag,
 } from "./types";
 
 type ListParams = {
@@ -54,6 +58,41 @@ export const getPopularPosts = async () =>
     revalidate: 600,
     tags: ["post"],
   });
+
+export const getCategoryHighlights = async () =>
+  sanityFetch<CategoryHighlight[]>(categoryHighlightsQuery, {}, {
+    revalidate: 600,
+    tags: ["category", "post"],
+  });
+
+type TagUsageDocument = {
+  tags?: string[];
+};
+
+export const getTrendingTags = async (limit = 10): Promise<TrendingTag[]> => {
+  const tagDocs = await sanityFetch<TagUsageDocument[]>(tagUsageSourceQuery, {}, {
+    revalidate: 600,
+    tags: ["post"],
+  });
+
+  const counts = new Map<string, number>();
+
+  tagDocs.forEach((doc) => {
+    doc.tags?.forEach((tag) => {
+      const normalized = tag?.trim();
+      if (!normalized) return;
+      counts.set(normalized, (counts.get(normalized) ?? 0) + 1);
+    });
+  });
+
+  return Array.from(counts.entries())
+    .sort((a, b) => {
+      if (b[1] !== a[1]) return b[1] - a[1];
+      return a[0].localeCompare(b[0], "ja");
+    })
+    .slice(0, limit)
+    .map(([name, count]) => ({ name, count }));
+};
 
 export const getPaginatedPosts = async (params: ListParams = {}) => {
   const limit = params.limit ?? PAGE_SIZE;
