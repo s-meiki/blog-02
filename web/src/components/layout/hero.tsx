@@ -17,7 +17,7 @@ type Metric = {
   value: string;
 };
 
-type HeroProps = {
+export type HeroProps = {
   title: string;
   description: string;
   featuredPost?: PostListItem | null;
