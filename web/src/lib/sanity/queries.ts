@@ -20,7 +20,24 @@ export const siteSettingsQuery = groq`*[_type == "siteSettings" && _id == "siteS
     metrics[]{
       label,
       value
+    },
+    backgroundPreset
+  },
+  popularWidget{
+    showTimeline,
+    accentColor,
+    "headerImage": headerImage{
+      "url": asset->url,
+      alt
     }
+  },
+  engagementCta{
+    badge,
+    title,
+    description,
+    primaryCta{label, href},
+    secondaryCta{label, href},
+    socialProof[]{label, value}
   },
   navigation[]{label, href, external},
   footerLinks[]{label, href},
@@ -54,7 +71,21 @@ export const popularPostsQuery = groq`*[_type == "post" && defined(slug.current)
     _id,
     title,
     "slug": slug.current,
-    publishedAt
+    excerpt,
+    publishedAt,
+    readingTime,
+    "coverImage": coverImage{
+      "url": asset->url,
+      alt
+    },
+    "author": author->{
+      name,
+      "slug": slug.current,
+      "avatar": avatar.asset->url
+    },
+    "categories": categories[]->{title, "slug": slug.current},
+    tags,
+    popularScore
   }`;
 
 export const paginatedPostsQuery = groq`*[_type == "post" && defined(slug.current) && !(_id in path("drafts.**")) && publishedAt <= now()

@@ -80,6 +80,27 @@ export type HeroSettings = {
   primaryCta?: HeroCta;
   secondaryCta?: HeroCta;
   metrics?: HeroMetric[];
+  backgroundPreset?: "none" | "glow" | "vibrant";
+};
+
+export type PopularWidgetSettings = {
+  showTimeline?: boolean;
+  accentColor?: string;
+  headerImage?: ImageWithAlt;
+};
+
+export type SocialProofStat = {
+  label?: string;
+  value?: string;
+};
+
+export type EngagementCtaSettings = {
+  badge?: string;
+  title: string;
+  description?: string;
+  primaryCta?: HeroCta;
+  secondaryCta?: HeroCta;
+  socialProof?: SocialProofStat[];
 };
 
 export type SiteSettings = {
@@ -93,6 +114,8 @@ export type SiteSettings = {
   footerLinks?: { label: string; href: string }[];
   socialLinks?: { platform: string; url: string }[];
   hero?: HeroSettings;
+  popularWidget?: PopularWidgetSettings;
+  engagementCta?: EngagementCtaSettings;
 };
 
 export type TagDetail = {

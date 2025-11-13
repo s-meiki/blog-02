@@ -90,6 +90,54 @@ export default defineType({
             }),
           ],
         }),
+        defineField({
+          name: "backgroundPreset",
+          title: "背景演出",
+          type: "string",
+          initialValue: "glow",
+          options: {
+            layout: "radio",
+            list: [
+              { title: "なし", value: "none" },
+              { title: "ソフトグロー", value: "glow" },
+              { title: "ビビッド", value: "vibrant" },
+            ],
+          },
+        }),
+      ],
+    }),
+    defineField({
+      name: "popularWidget",
+      title: "人気記事ウィジェット",
+      type: "object",
+      fields: [
+        defineField({
+          name: "showTimeline",
+          title: "タイムライン装飾を表示",
+          type: "boolean",
+          initialValue: true,
+        }),
+        defineField({
+          name: "accentColor",
+          title: "アクセントカラー",
+          type: "string",
+          description: "例: #2563eb",
+        }),
+        defineField({
+          name: "headerImage",
+          title: "ヘッダー画像",
+          type: "image",
+          description: "人気記事セクションの見出し横に表示されます。",
+          options: { hotspot: true },
+          fields: [
+            defineField({
+              name: "alt",
+              title: "代替テキスト",
+              type: "string",
+              validation: (rule) => rule.max(120),
+            }),
+          ],
+        }),
       ],
     }),
     defineField({
@@ -210,6 +258,81 @@ export default defineType({
               type: "url",
               title: "URL",
               validation: (rule) => rule.required(),
+            }),
+          ],
+        }),
+      ],
+    }),
+    defineField({
+      name: "engagementCta",
+      title: "エンゲージメント CTA",
+      type: "object",
+      fields: [
+        defineField({
+          name: "badge",
+          title: "バッジ",
+          type: "string",
+        }),
+        defineField({
+          name: "title",
+          title: "タイトル",
+          type: "string",
+          validation: (rule) => rule.required(),
+        }),
+        defineField({
+          name: "description",
+          title: "説明",
+          type: "text",
+          rows: 3,
+        }),
+        defineField({
+          name: "primaryCta",
+          title: "メイン CTA",
+          type: "object",
+          fields: [
+            defineField({
+              name: "label",
+              title: "ラベル",
+              type: "string",
+              validation: (rule) => rule.required(),
+            }),
+            defineField({
+              name: "href",
+              title: "リンク先",
+              type: "string",
+              validation: (rule) => rule.required(),
+            }),
+          ],
+        }),
+        defineField({
+          name: "secondaryCta",
+          title: "サブ CTA",
+          type: "object",
+          fields: [
+            defineField({
+              name: "label",
+              title: "ラベル",
+              type: "string",
+            }),
+            defineField({
+              name: "href",
+              title: "リンク先",
+              type: "string",
+            }),
+          ],
+        }),
+        defineField({
+          name: "socialProof",
+          title: "ソーシャルプルーフ",
+          type: "array",
+          of: [
+            defineField({
+              name: "proof",
+              type: "object",
+              fields: [
+                defineField({ name: "label", type: "string", title: "ラベル" }),
+                defineField({ name: "value", type: "string", title: "値" }),
+              ],
             }),
           ],
         }),
