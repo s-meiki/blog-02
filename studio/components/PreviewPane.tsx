@@ -37,6 +37,9 @@ const buildPreviewTarget = (doc: SanityDocument & { slug?: { current?: string | 
       }
       return { path: `/${slug}`, slug };
     }
+    case "siteSettings": {
+      return { path: "/", slug: null };
+    }
     default:
       return null;
   }
@@ -115,6 +118,10 @@ const buildPreviewUrl = (
   if (!target) return null;
 
   try {
+    if (doc._type === "siteSettings") {
+      return new URL("/", baseUrl).toString();
+    }
+
     const url = new URL("/api/preview", baseUrl);
     url.searchParams.set("type", doc._type);
     url.searchParams.set("path", target.path);
