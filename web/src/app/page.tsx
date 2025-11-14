@@ -19,8 +19,7 @@ export default async function HomePage() {
     getCategoryHighlights(),
   ]);
 
-  const featuredPost = latestPosts?.[0] ?? null;
-  const latestGridPosts = featuredPost ? latestPosts?.slice(1, 7) ?? [] : latestPosts ?? [];
+  const latestGridPosts = latestPosts ?? [];
   const highlightedCategories = categoryHighlights ?? [];
 
   const heroTitle = settings?.siteTitle ?? "ブログ";
@@ -86,7 +85,7 @@ export default async function HomePage() {
       <Hero
         title={heroTitle}
         description={heroDescription}
-        featuredPost={featuredPost}
+        featuredPost={null}
         eyebrow={heroSettings?.eyebrow ?? undefined}
         primaryCta={heroSettings?.primaryCta ?? undefined}
         secondaryCta={heroSettings?.secondaryCta ?? undefined}
