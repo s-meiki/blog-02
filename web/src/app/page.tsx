@@ -1,3 +1,5 @@
+import { Suspense } from "react";
+
 import { ArticleCard } from "@/components/blog/article-card";
 import Link from "next/link";
 import { PopularPosts } from "@/components/blog/popular-posts";
@@ -5,28 +7,21 @@ import { Container } from "@/components/layout/container";
 import { Hero } from "@/components/layout/hero";
 import { LatestSection } from "@/components/home/latest-section";
 import { EngagementCta } from "@/components/home/engagement-cta";
-import {
-  getCategoryHighlights,
-  getLatestPosts,
-  getPopularPosts,
-  getSiteSettings,
-  getTrendingTags,
-} from "@/lib/sanity/api";
+import { CategoryNav } from "@/components/home/category-nav";
+import { getCategoryHighlights, getLatestPosts, getPopularPosts, getSiteSettings } from "@/lib/sanity/api";
 
 export const revalidate = 120;
 
 export default async function HomePage() {
-  const [settings, latestPosts, popularPosts, categoryHighlights, trendingTags] = await Promise.all([
+  const [settings, latestPosts, popularPosts, categoryHighlights] = await Promise.all([
     getSiteSettings(),
     getLatestPosts(),
     getPopularPosts(),
     getCategoryHighlights(),
-    getTrendingTags(),
   ]);
 
   const featuredPost = latestPosts?.[0] ?? null;
   const latestGridPosts = featuredPost ? latestPosts?.slice(1, 7) ?? [] : latestPosts ?? [];
-  const topTags = trendingTags ?? [];
   const highlightedCategories = categoryHighlights ?? [];
 
   const heroTitle = settings?.siteTitle ?? "ブログ";
@@ -91,6 +86,8 @@ export default async function HomePage() {
         backgroundPreset={heroSettings?.backgroundPreset ?? undefined}
       />
 
+      <CategoryNav categories={highlightedCategories} />
+
       <div className="bg-neutral-50/60">
         <Container className="space-y-16 py-16">
           <section className="flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-16">
@@ -103,36 +100,17 @@ export default async function HomePage() {
               />
             </div>
             <div className="order-2 lg:order-1 lg:flex-1">
-              <LatestSection posts={latestGridPosts} />
+              <Suspense
+                fallback={
+                  <div className="rounded-[32px] border border-dashed border-primary-900/20 bg-white/70 p-10 text-center text-sm text-neutral-500">
+                    最新の記事を読み込み中です…
+                  </div>
+                }
+              >
+                <LatestSection posts={latestGridPosts} />
+              </Suspense>
             </div>
           </section>
-
-          {topTags.length > 0 && (
-            <section className="rounded-[32px] border border-primary-900/10 bg-primary-900 text-white">
-              <div className="grid gap-6 p-8 sm:p-10 lg:grid-cols-[280px_minmax(0,1fr)] lg:items-center">
-                <div className="space-y-3">
-                  <p className="text-xs font-semibold uppercase tracking-[0.35em] text-white/70">Topics</p>
-                  <h3 className="text-2xl font-display">気になるテーマから読む</h3>
-                  <p className="text-sm text-white/80">
-                    最近よく読まれているタグをピックアップしました。気になるテーマをクリックして記事を探してみてください。
-                  </p>
-                </div>
-                <div className="flex flex-wrap gap-3" aria-label="人気のタグ">
-                  {topTags.map((tag) => (
-                    <Link
-                      key={tag.name}
-                      href={`/tag/${encodeURIComponent(tag.name)}`}
-                      className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-4 py-2 text-sm font-medium text-white/90 backdrop-blur transition hover:bg-white/20"
-                      aria-label={`${tag.name}のタグ一覧 (${tag.count}件の記事)`}
-                    >
-                      {tag.name}
-                      <span className="rounded-full bg-white/20 px-2 py-0.5 text-xs text-white/80">{tag.count}</span>
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            </section>
-          )}
 
           {settings?.engagementCta && <EngagementCta settings={settings.engagementCta} />}
 
