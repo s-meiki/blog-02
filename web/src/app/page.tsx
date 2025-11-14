@@ -1,7 +1,6 @@
 import { Suspense } from "react";
 
 import { ArticleCard } from "@/components/blog/article-card";
-import Link from "next/link";
 import { PopularPosts } from "@/components/blog/popular-posts";
 import { Container } from "@/components/layout/container";
 import { Hero } from "@/components/layout/hero";
@@ -75,6 +74,15 @@ export default async function HomePage() {
           }}
         />
       )}
+      {highlightedCategories.length > 0 && (
+        <CategoryNav
+          categories={highlightedCategories.map((category) => ({
+            title: category.title,
+            slug: category.slug,
+          }))}
+        />
+      )}
+
       <Hero
         title={heroTitle}
         description={heroDescription}
@@ -85,8 +93,6 @@ export default async function HomePage() {
         metrics={heroSettings?.metrics ?? undefined}
         backgroundPreset={heroSettings?.backgroundPreset ?? undefined}
       />
-
-      <CategoryNav categories={highlightedCategories} />
 
       <div className="bg-neutral-50/60">
         <Container className="space-y-16 py-16">
@@ -113,60 +119,6 @@ export default async function HomePage() {
           </section>
 
           {settings?.engagementCta && <EngagementCta settings={settings.engagementCta} />}
-
-          {highlightedCategories.length > 0 ? (
-            <section className="space-y-6">
-              <div className="flex flex-col gap-2">
-                <p className="text-xs font-semibold uppercase tracking-[0.35em] text-primary-500">Collections</p>
-                <h2 className="text-3xl font-display font-semibold text-primary-900">カテゴリで深掘り</h2>
-                <p className="text-neutral-600">学びたい領域にあわせて記事をまとめました。</p>
-              </div>
-              <div className="grid gap-6 lg:grid-cols-3">
-                {highlightedCategories.map((category) => {
-                  const description = category.description ?? category.featuredPost?.excerpt ?? "関連記事を集めました。";
-                  return (
-                    <Link
-                      key={category.slug}
-                      href={`/category/${category.slug}`}
-                      className="group flex h-full flex-col gap-4 rounded-[28px] border border-neutral-200 bg-white p-6 shadow-soft transition hover:-translate-y-1 hover:shadow-[0_28px_60px_-40px_rgba(15,23,42,0.35)]"
-                      aria-label={`${category.title}カテゴリーの記事一覧 (${category.postCount}件)`}
-                    >
-                      <p className="text-xs font-semibold uppercase tracking-[0.35em] text-primary-500">
-                        Category
-                      </p>
-                      <div className="space-y-2">
-                        <h3 className="text-2xl font-display font-semibold text-primary-900">{category.title}</h3>
-                        <p className="line-clamp-3 text-sm text-neutral-600">{description}</p>
-                      </div>
-                      <div className="mt-auto flex items-center justify-between text-sm font-semibold text-primary-700">
-                        <span className="inline-flex items-center gap-2">
-                          記事一覧へ
-                          <svg
-                            viewBox="0 0 24 24"
-                            className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1"
-                            aria-hidden="true"
-                          >
-                            <path
-                              d="M5 12h14M13 6l6 6-6 6"
-                              stroke="currentColor"
-                              strokeWidth="1.5"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            />
-                          </svg>
-                        </span>
-                        <span className="text-xs font-medium text-primary-500/80">{category.postCount}件</span>
-                      </div>
-                    </Link>
-                  );
-                })}
-              </div>
-            </section>
-          ) : (
-            <section className="rounded-[28px] border border-dashed border-primary-900/20 bg-white/80 p-8 text-center text-sm text-neutral-500">
-              カテゴリ情報を取得できませんでした。Sanity でカテゴリを作成してからご確認ください。
-            </section>
-          )}
 
           <section className="space-y-6 rounded-[32px] border border-neutral-200 bg-white/95 p-8 shadow-soft">
             <div className="flex flex-col gap-2">
