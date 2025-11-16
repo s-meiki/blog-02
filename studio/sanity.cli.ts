@@ -8,6 +8,7 @@ export default defineCliConfig({
   vite: {
     server: {
       port: Number(process.env.SANITY_STUDIO_PORT ?? 3333),
+      strictPort: false,
       open: false,
     },
   },

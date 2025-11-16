@@ -49,7 +49,8 @@ export const Hero = ({
   const resolvedPrimary = primaryCta ?? FALLBACK_PRIMARY_CTA;
   const resolvedSecondary = secondaryCta ?? FALLBACK_SECONDARY_CTA;
   const displayMetrics = metrics && metrics.length > 0 ? metrics : FALLBACK_METRICS;
-  const preset = backgroundPreset ?? "glow";
+  const preset = backgroundPreset ?? "none";
+  const showBackground = preset !== "none";
 
   const renderBackgroundEffects = () => {
     if (preset === "none") return null;
@@ -76,10 +77,12 @@ export const Hero = ({
 
   return (
     <section className="relative overflow-hidden py-20 sm:py-24">
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary-900/8 via-transparent to-accent-200/30">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(20,54,85,0.18),_transparent_55%)]" />
-        {renderBackgroundEffects()}
-      </div>
+      {showBackground && (
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary-900/8 via-transparent to-accent-200/30">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(20,54,85,0.18),_transparent_55%)]" />
+          {renderBackgroundEffects()}
+        </div>
+      )}
       <Container className="relative flex flex-col gap-14 lg:flex-row lg:items-center">
         <div className="max-w-2xl space-y-8">
           <span className="inline-flex items-center gap-4 text-xs font-semibold uppercase tracking-[0.35em] text-primary-600">
