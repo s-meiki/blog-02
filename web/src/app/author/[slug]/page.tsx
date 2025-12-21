@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -157,7 +158,9 @@ export default async function AuthorPage({
         </section>
 
         <div className="space-y-6">
-          <BlogSearchForm actionPath={`/author/${slug}`} />
+          <Suspense fallback={null}>
+            <BlogSearchForm actionPath={`/author/${slug}`} />
+          </Suspense>
           {postsResult.items.length > 0 ? (
             <div className="grid gap-8 md:grid-cols-2">
               {postsResult.items.map((post) => (

@@ -15,7 +15,7 @@ type HeaderProps = {
 export const Header = ({ settings }: HeaderProps) => {
   const [open, setOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
-  const nav = settings?.navigation ?? [];
+  const nav = [...(settings?.navigation ?? []), { label: "Blog", href: "/blog" }, { label: "Profile", href: "/profile" }, { label: "Newsletter", href: "/newsletter" }];
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -39,7 +39,7 @@ export const Header = ({ settings }: HeaderProps) => {
           </span>
           <span>{settings?.siteTitle ?? "Journal"}</span>
         </Link>
-        <nav className="hidden items-center gap-7 text-sm font-medium text-primary-700 lg:flex">
+        <nav className="ml-auto mr-6 hidden items-center gap-7 text-sm font-medium text-primary-700 lg:flex">
           {nav.map((item) => (
             <Link
               key={item.href}

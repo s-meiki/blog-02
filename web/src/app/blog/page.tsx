@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Link from "next/link";
 
 import { ArticleCard } from "@/components/blog/article-card";
@@ -71,7 +72,9 @@ export default async function BlogPage({
                 検索やタグ・カテゴリフィルタを活用して、目的の記事を素早く見つけましょう。
               </p>
             </div>
-            <BlogSearchForm actionPath="/blog" />
+            <Suspense fallback={null}>
+              <BlogSearchForm actionPath="/blog" />
+            </Suspense>
             <p className="text-sm text-neutral-500">
               全 {total} 件の記事を掲載中。ページ {page} / {pageCount}
             </p>

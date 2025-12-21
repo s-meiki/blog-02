@@ -17,6 +17,7 @@
     "sanity.cli.ts",
     "structure.ts",
     "schemaTypes/**/*.ts",
-    "lib/**/*.ts"
+    "lib/**/*.ts",
+    "tests/**/*.ts"
   ]
 }

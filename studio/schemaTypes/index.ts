@@ -11,19 +11,9 @@ import codeBlock from "./objects/codeBlock";
 import tweetEmbed from "./objects/tweetEmbed";
 import youtubeEmbed from "./objects/youtubeEmbed";
 
-const schemaTypes = [
-  post,
-  category,
-  tag,
-  author,
-  page,
-  siteSettings,
-  seo,
-  blockContent,
-  imageWithCaption,
-  codeBlock,
-  tweetEmbed,
-  youtubeEmbed,
-];
+export const documentSchemas = [post, category, tag, author, page, siteSettings];
+export const objectSchemas = [seo, blockContent, imageWithCaption, codeBlock, tweetEmbed, youtubeEmbed];
+
+const schemaTypes = [...documentSchemas, ...objectSchemas];
 
 export default schemaTypes;

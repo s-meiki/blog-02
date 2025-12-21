@@ -1,11 +1,13 @@
 import "./globals.css";
 
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { Inter, Noto_Sans_JP, Noto_Serif_JP } from "next/font/google";
 
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
 import { SkipLink } from "@/components/ui/skip-link";
+import { Analytics } from "@/components/common/analytics";
 import { getSiteSettings } from "@/lib/sanity/api";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
@@ -52,6 +54,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           {children}
         </main>
         <Footer settings={settings ?? undefined} />
+        <Suspense fallback={null}>
+          <Analytics />
+        </Suspense>
       </body>
     </html>
   );

@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
@@ -129,7 +130,9 @@ export default async function CategoryPage({
         <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_320px]">
           <div className="space-y-10">
             <div className="space-y-4">
-              <BlogSearchForm actionPath={`/category/${slug}`} />
+              <Suspense fallback={null}>
+                <BlogSearchForm actionPath={`/category/${slug}`} />
+              </Suspense>
               <p className="text-sm text-neutral-500">
                 全 {postsResult.total} 件の記事
                 {postsResult.items[0]?.publishedAt && (

@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
@@ -125,7 +126,9 @@ export default async function TagPage({
         <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_320px]">
           <div className="space-y-10">
             <div className="space-y-4">
-              <BlogSearchForm actionPath={`/tag/${slug}`} />
+              <Suspense fallback={null}>
+                <BlogSearchForm actionPath={`/tag/${slug}`} />
+              </Suspense>
             </div>
 
             {postsResult.items.length > 0 ? (

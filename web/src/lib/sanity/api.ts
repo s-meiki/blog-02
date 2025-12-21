@@ -1,4 +1,5 @@
 import type { QueryParams } from "@sanity/client";
+import { cache } from "react";
 
 import { sanityFetch } from "./fetch";
 import {
@@ -41,11 +42,13 @@ type ListParams = {
 
 const PAGE_SIZE = 10;
 
-export const getSiteSettings = async () =>
+const siteSettingsFetcher = cache(async () =>
   sanityFetch<SiteSettings | null>(siteSettingsQuery, {}, {
     revalidate: 3600,
     tags: ["siteSettings"],
-  });
+  }));
+
+export const getSiteSettings = () => siteSettingsFetcher();
 
 export const getLatestPosts = async () =>
   sanityFetch<PostListItem[]>(latestPostsQuery, {}, {
@@ -53,11 +56,13 @@ export const getLatestPosts = async () =>
     tags: ["post"],
   });
 
-export const getPopularPosts = async () =>
+const popularPostsFetcher = cache(async () =>
   sanityFetch<PostListItem[]>(popularPostsQuery, {}, {
     revalidate: 600,
     tags: ["post"],
-  });
+  }));
+
+export const getPopularPosts = () => popularPostsFetcher();
 
 export const getCategoryHighlights = async () =>
   sanityFetch<CategoryHighlight[]>(categoryHighlightsQuery, {}, {
@@ -69,11 +74,14 @@ type TagUsageDocument = {
   tags?: string[];
 };
 
-export const getTrendingTags = async (limit = 10): Promise<TrendingTag[]> => {
-  const tagDocs = await sanityFetch<TagUsageDocument[]>(tagUsageSourceQuery, {}, {
+const tagUsageFetcher = cache(async () =>
+  sanityFetch<TagUsageDocument[]>(tagUsageSourceQuery, {}, {
     revalidate: 600,
     tags: ["post"],
-  });
+  }));
+
+export const getTrendingTags = async (limit = 10): Promise<TrendingTag[]> => {
+  const tagDocs = await tagUsageFetcher();
 
   const counts = new Map<string, number>();
 
@@ -103,30 +111,21 @@ export const getPaginatedPosts = async (params: ListParams = {}) => {
   const listParams: QueryParams = { offset, limit };
   const countParams: QueryParams = {};
 
-  if (params.query) {
-    listParams.search = params.query;
-    countParams.search = params.query;
-  }
+  // Ensure all parameters are defined, even if null, to avoid "param referenced but not provided" errors
+  listParams.search = params.query ?? null;
+  countParams.search = params.query ?? null;
 
-  if (pattern) {
-    listParams.pattern = pattern;
-    countParams.pattern = pattern;
-  }
+  listParams.pattern = pattern ?? null;
+  countParams.pattern = pattern ?? null;
 
-  if (params.category) {
-    listParams.category = params.category;
-    countParams.category = params.category;
-  }
+  listParams.category = params.category ?? null;
+  countParams.category = params.category ?? null;
 
-  if (params.tag) {
-    listParams.tagSlug = params.tag;
-    countParams.tagSlug = params.tag;
-  }
+  listParams.tagSlug = params.tag ?? null;
+  countParams.tagSlug = params.tag ?? null;
 
-  if (params.author) {
-    listParams.author = params.author;
-    countParams.author = params.author;
-  }
+  listParams.author = params.author ?? null;
+  countParams.author = params.author ?? null;
 
   const [items, total] = await Promise.all([
     sanityFetch<PostListItem[]>(
