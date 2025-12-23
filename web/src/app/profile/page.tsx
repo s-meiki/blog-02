@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import {
   Twitter,
   Mail,
@@ -45,10 +46,12 @@ export default function ProfilePage() {
             <div className="relative shrink-0">
               <div className="h-44 w-44 overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-accent-200 to-primary-200 p-1 shadow-2xl ring-4 ring-white/50">
                 <div className="relative h-full w-full overflow-hidden rounded-[2.3rem] bg-neutral-100 shadow-inner">
-                  <img
+                  <Image
                     src="/profile-me.jpg"
                     alt="めいき | 須賀明輝"
-                    className="h-full w-full object-cover"
+                    fill
+                    className="object-cover"
+                    priority
                   />
                 </div>
               </div>
