@@ -1,16 +1,9 @@
 import type { Metadata } from "next";
 import {
-  Github,
   Twitter,
   Mail,
-  Code2,
-  Palette,
-  Camera,
-  Coffee,
-  ExternalLink,
   MapPin,
   Briefcase,
-  Layers,
   Sparkles,
   Trophy,
   Users,
