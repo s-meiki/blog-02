@@ -5,7 +5,7 @@ import PreviewPane from "./components/PreviewPane";
 
 const singletonTypes = new Set(["siteSettings"]);
 const singletonActions = new Set(["publish", "discardChanges", "restore"]);
-const previewableTypes = new Set(["post", "page"]);
+const previewableTypes = new Set(["post", "page", "siteSettings"]);
 
 export const structure: StructureResolver = (S) =>
   S.list()
@@ -20,7 +20,11 @@ export const structure: StructureResolver = (S) =>
           S.editor()
             .id("siteSettings")
             .schemaType("siteSettings")
-            .documentId("siteSettings"),
+            .documentId("siteSettings")
+            .views([
+              S.view.form(),
+              S.view.component(PreviewPane).id("preview").title("プレビュー"),
+            ]),
         ),
       S.divider(),
       S.documentTypeListItem("post").title("記事"),

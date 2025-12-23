@@ -7,7 +7,8 @@
     "dev": "sanity dev",
     "build": "sanity build",
     "deploy": "sanity deploy",
-    "lint": "eslint . --ext .ts,.tsx,.js"
+    "lint": "eslint . --ext .ts,.tsx,.js",
+    "test": "vitest run"
   },
   "dependencies": {
     "@sanity/icons": "2.11.8",
@@ -25,6 +26,7 @@
     "@typescript-eslint/eslint-plugin": "^8.45.0",
     "@typescript-eslint/parser": "^8.45.0",
     "eslint": "^9.36.0",
-    "typescript": "^5.4.0"
+    "typescript": "^5.4.0",
+    "vitest": "^2.1.4"
   }
 }
