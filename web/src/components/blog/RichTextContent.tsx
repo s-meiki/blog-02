@@ -1,6 +1,7 @@
 import Image from "next/image";
 import ReactMarkdown, { type Components as MarkdownComponents } from "react-markdown";
 import remarkGfm from "remark-gfm";
+import remarkBreaks from "remark-breaks";
 import { PortableText, type PortableTextComponents } from "@portabletext/react";
 import type { PortableTextBlock, PortableTextSpan } from "@portabletext/types";
 import { toString } from "mdast-util-to-string";
@@ -365,7 +366,7 @@ const MarkdownBody = ({ markdown }: { markdown: string }) => {
   };
 
   return (
-    <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
+    <ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]} components={markdownComponents}>
       {markdown}
     </ReactMarkdown>
   );

@@ -3,8 +3,25 @@
   position: sticky;
   top: 0;
   z-index: 100;
-  background-color: white;
-  border-bottom: 1px solid #ddd;
+  background-color: #1a1a1a;
+  color: white;
+  border-bottom: 1px solid #333;
+  border-radius: 0;
+}
+
+.EasyMDEContainer .editor-toolbar button {
+  color: white !important;
+}
+
+.EasyMDEContainer .editor-toolbar button:hover,
+.EasyMDEContainer .editor-toolbar button.active {
+  background-color: #333 !important;
+  border-color: #555 !important;
+}
+
+.EasyMDEContainer .editor-toolbar i.separator {
+  border-right-color: #555;
+  border-left-color: #555;
 }
 
 /* Ensure the toolbar doesn't overlap content abruptly */
