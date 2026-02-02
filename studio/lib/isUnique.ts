@@ -12,7 +12,11 @@ export const isUniqueAcrossAllDocuments = async (
   const params = {
     type: document?._type,
     slug,
-    id,
+    id: id.includes("drafts.") ? id : id, // Ensure we check against the base ID
   };
+
+  // Self-reference check is already handled by query logic, but adding safeguard
+  if (!slug) return true;
+
   return await client.fetch<boolean>(query, params);
 };

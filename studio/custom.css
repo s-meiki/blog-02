@@ -1,0 +1,13 @@
+/* Sticky Markdown Toolbar */
+.EasyMDEContainer .editor-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background-color: white;
+  border-bottom: 1px solid #ddd;
+}
+
+/* Ensure the toolbar doesn't overlap content abruptly */
+.CodeMirror {
+  margin-top: 0;
+}

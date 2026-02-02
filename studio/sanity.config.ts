@@ -3,6 +3,8 @@ import { defineConfig } from "sanity";
 import { visionTool } from "@sanity/vision";
 import { markdownSchema } from "sanity-plugin-markdown";
 
+import "./custom.css";
+
 import { structure, canUseAction, defaultDocumentNode } from "./structure";
 import schemaTypes from "./schemaTypes";
 

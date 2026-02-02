@@ -6,7 +6,9 @@ import { draftMode } from "next/headers";
 import { unstable_noStore as noStore } from "next/cache";
 
 import { Breadcrumbs } from "@/components/blog/breadcrumbs";
+import { FloatingTOC } from "@/components/blog/FloatingTOC";
 import { PostHeader } from "@/components/blog/post-header";
+import { ReadingProgressBar } from "@/components/blog/ReadingProgressBar";
 import { RichTextContent } from "@/components/blog/RichTextContent";
 import { RelatedPosts } from "@/components/blog/post-related";
 import { ShareButtons } from "@/components/blog/share/ShareButtons";
@@ -64,10 +66,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       images: post.seo?.ogImage?.asset?._ref
         ? [{ url: `/api/og?slug=${post.slug}` }]
         : ogImage
-        ? [{ url: ogImage }]
-        : settings?.defaultOgImage
-        ? [{ url: settings.defaultOgImage }]
-        : undefined,
+          ? [{ url: ogImage }]
+          : settings?.defaultOgImage
+            ? [{ url: settings.defaultOgImage }]
+            : undefined,
       authors: post.author?.name ? [post.author.name] : undefined,
       tags: post.tags,
       publishedTime: post.publishedAt,
@@ -80,10 +82,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       images: post.seo?.ogImage?.asset?._ref
         ? [`/api/og?slug=${post.slug}`]
         : ogImage
-        ? [ogImage]
-        : settings?.defaultOgImage
-        ? [settings.defaultOgImage]
-        : undefined,
+          ? [ogImage]
+          : settings?.defaultOgImage
+            ? [settings.defaultOgImage]
+            : undefined,
     },
   };
 }
@@ -129,63 +131,75 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
       <Script id="breadcrumb-ld-json" type="application/ld+json" strategy="afterInteractive">
         {JSON.stringify(breadcrumbJsonLd)}
       </Script>
+      <ReadingProgressBar />
       <div className="bg-gradient-to-b from-neutral-100/70 via-neutral-50 to-neutral-100/60 py-16">
-        <Container className="flex flex-col items-center">
-          <article className="w-full">
-            <div className="mx-auto flex w-full max-w-[900px] flex-col gap-10">
-              <Breadcrumbs
-                items={[
-                  { label: "ホーム", href: "/" },
-                  { label: "ブログ", href: "/blog" },
-                  { label: post.title },
-                ]}
-              />
-              <div className="flex flex-col gap-10 rounded-[32px] border border-neutral-200/80 bg-white/95 p-8 shadow-[0_45px_100px_-50px_rgba(30,41,59,0.35)] backdrop-blur-sm sm:p-12 lg:p-14">
-                <PostHeader post={post} />
-                {post.coverImage?.url && (
-                  <figure className="overflow-hidden rounded-[24px]">
-                    <Image
-                      src={post.coverImage.url}
-                      alt={post.coverImage.alt ?? post.title}
-                      width={1600}
-                      height={900}
-                      className="h-auto w-full object-cover"
-                      priority
-                    />
-                  </figure>
-                )}
-                {headings.length > 0 && (
-                  <div className="rounded-[24px] border border-neutral-200/80 bg-neutral-50/60 p-6">
-                    <p className="text-xs font-semibold uppercase tracking-[0.3em] text-primary-500">目次</p>
-                    <ul className="mt-4 space-y-2 text-sm text-neutral-600">
-                      {headings.map((heading) => {
-                        const indentClass =
-                          heading.level === 3 ? "ml-4" : heading.level >= 4 ? "ml-8" : "";
-                        return (
-                          <li key={heading.id}>
-                            <a
-                              href={`#${heading.id}`}
-                              className={cn(
-                                "block rounded-lg px-2 py-1 transition hover:bg-primary-50/80 hover:text-primary-700",
-                                indentClass,
-                              )}
-                            >
-                              {heading.text}
-                            </a>
-                          </li>
-                        );
-                      })}
-                    </ul>
+        <Container>
+          <div className="mx-auto flex max-w-[1200px] gap-10">
+            {/* Main Article */}
+            <article className="min-w-0 flex-1">
+              <div className="mx-auto flex w-full max-w-[900px] flex-col gap-10">
+                <Breadcrumbs
+                  items={[
+                    { label: "ホーム", href: "/" },
+                    { label: "ブログ", href: "/blog" },
+                    { label: post.title },
+                  ]}
+                />
+                <div className="flex flex-col gap-10 rounded-[32px] border border-neutral-200/80 bg-white/95 p-8 shadow-[0_45px_100px_-50px_rgba(30,41,59,0.35)] backdrop-blur-sm sm:p-12 lg:p-14">
+                  <PostHeader post={post} />
+                  {post.coverImage?.url && (
+                    <figure className="overflow-hidden rounded-[24px]">
+                      <Image
+                        src={post.coverImage.url}
+                        alt={post.coverImage.alt ?? post.title}
+                        width={1600}
+                        height={900}
+                        className="h-auto w-full object-cover"
+                        priority
+                      />
+                    </figure>
+                  )}
+                  {/* Inline TOC for mobile/tablet */}
+                  {headings.length > 0 && (
+                    <div className="rounded-[24px] border border-neutral-200/80 bg-neutral-50/60 p-6 xl:hidden">
+                      <p className="text-xs font-semibold uppercase tracking-[0.3em] text-primary-500">目次</p>
+                      <ul className="mt-4 space-y-2 text-sm text-neutral-600">
+                        {headings.map((heading) => {
+                          const indentClass =
+                            heading.level === 3 ? "ml-4" : heading.level >= 4 ? "ml-8" : "";
+                          return (
+                            <li key={heading.id}>
+                              <a
+                                href={`#${heading.id}`}
+                                className={cn(
+                                  "block rounded-lg px-2 py-1 transition hover:bg-primary-50/80 hover:text-primary-700",
+                                  indentClass,
+                                )}
+                              >
+                                {heading.text}
+                              </a>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    </div>
+                  )}
+                  <RichTextContent markdown={post.bodyMarkdown} portable={post.body ?? undefined} />
+                  <div className="border-t border-dashed border-neutral-200 pt-8">
+                    <ShareButtons post={post} />
                   </div>
-                )}
-                <RichTextContent markdown={post.bodyMarkdown} portable={post.body ?? undefined} />
-                <div className="border-t border-dashed border-neutral-200 pt-8">
-                  <ShareButtons post={post} />
                 </div>
+                <RelatedPosts posts={relatedPosts ?? []} />
               </div>
-              <RelatedPosts posts={relatedPosts ?? []} />
-            </div>
-          </article>
+            </article>
+
+            {/* Floating TOC Sidebar (desktop only) */}
+            {headings.length > 0 && (
+              <aside className="hidden w-64 shrink-0 xl:block">
+                <FloatingTOC headings={headings} />
+              </aside>
+            )}
+          </div>
         </Container>
       </div>
     </>

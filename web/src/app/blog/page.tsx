@@ -3,6 +3,7 @@ import Link from "next/link";
 
 import { ArticleCard } from "@/components/blog/article-card";
 import { BlogSearchForm } from "@/components/blog/blog-search-form";
+import { FeaturedArticleCard } from "@/components/blog/FeaturedArticleCard";
 import { Container } from "@/components/layout/container";
 import { Pagination } from "@/components/ui/pagination";
 import { getPaginatedPosts, getPopularPosts } from "@/lib/sanity/api";
@@ -81,11 +82,17 @@ export default async function BlogPage({
           </div>
 
           {items.length > 0 ? (
-            <div className="grid gap-8 md:grid-cols-2">
-              {items.map((post: PostListItem) => (
-                <ArticleCard key={post._id} post={post} />
-              ))}
-            </div>
+            <>
+              {/* Show featured card for first post on page 1 without filters */}
+              {page === 1 && !query && !tag && !category && items[0] && (
+                <FeaturedArticleCard post={items[0]} />
+              )}
+              <div className="grid gap-8 md:grid-cols-2">
+                {(page === 1 && !query && !tag && !category ? items.slice(1) : items).map((post: PostListItem) => (
+                  <ArticleCard key={post._id} post={post} />
+                ))}
+              </div>
+            </>
           ) : (
             <EmptyState query={query} />
           )}

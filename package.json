@@ -3,7 +3,8 @@
     "dev": "npm run dev --prefix web",
     "build": "npm run build --prefix web",
     "start": "npm run start --prefix web",
-    "lint": "npm run lint --prefix web"
+    "lint": "npm run lint --prefix web",
+    "studio": "npm run dev --prefix studio"
   },
   "dependencies": {
     "next": "^15.5.3",
