@@ -11,6 +11,7 @@ import type { Element, Text as HastText } from "hast";
 import { urlForImage } from "@/lib/image";
 import { createHeadingIdGenerator } from "@/lib/utils/headings";
 import { cn } from "@/lib/utils/cn";
+import { normalizeMarkdownEmphasis } from "@/lib/utils/normalize-markdown";
 
 type PortableOrMarkdown = {
   portable?: PortableTextBlock[] | null;
@@ -115,6 +116,115 @@ const getPortableBlockText = (block: PortableTextBlock) => {
   return spans?.map((child) => child.text ?? "").join("") ?? "";
 };
 
+const MARKDOWN_HEADING_IN_TEXT = /^[^\S\r\n]*([#＃]{2,4})[^\S\r\n]+(.+)$/u;
+const STRONG_MARKDOWN_PATTERN = /\*\*([^*\r\n]+?)\*\*/gu;
+
+const expandMarkdownStrongSpans = (children: PortableTextSpan[], blockKey: string) => {
+  const expanded: PortableTextSpan[] = [];
+
+  children.forEach((span, index) => {
+    if (span?._type !== "span") {
+      expanded.push(span);
+      return;
+    }
+
+    const marks = Array.isArray(span.marks) ? span.marks : [];
+    if (marks.length > 0 || typeof span.text !== "string") {
+      expanded.push(span);
+      return;
+    }
+
+    const normalizedText = normalizeMarkdownEmphasis(span.text);
+    STRONG_MARKDOWN_PATTERN.lastIndex = 0;
+    let cursor = 0;
+    let match = STRONG_MARKDOWN_PATTERN.exec(normalizedText);
+    let segment = 0;
+
+    if (!match) {
+      if (normalizedText !== span.text) {
+        expanded.push({ ...span, text: normalizedText });
+      } else {
+        expanded.push(span);
+      }
+      return;
+    }
+
+    while (match) {
+      const [fullMatch, strongText] = match;
+      const start = match.index;
+      const end = start + fullMatch.length;
+
+      if (start > cursor) {
+        expanded.push({
+          ...span,
+          _key: `${blockKey}-${index}-${segment++}`,
+          text: normalizedText.slice(cursor, start),
+          marks: [],
+        });
+      }
+
+      expanded.push({
+        ...span,
+        _key: `${blockKey}-${index}-${segment++}`,
+        text: strongText,
+        marks: ["strong"],
+      });
+
+      cursor = end;
+      match = STRONG_MARKDOWN_PATTERN.exec(normalizedText);
+    }
+
+    if (cursor < normalizedText.length) {
+      expanded.push({
+        ...span,
+        _key: `${blockKey}-${index}-${segment}`,
+        text: normalizedText.slice(cursor),
+        marks: [],
+      });
+    }
+  });
+
+  return expanded;
+};
+
+const normalizePortableMarkdownLike = (portable: PortableTextBlock[]) =>
+  portable.map((block) => {
+    if (block?._type !== "block") return block;
+
+    const rawChildren = (block.children as PortableTextSpan[] | undefined) ?? [];
+    const children = expandMarkdownStrongSpans(rawChildren, block._key ?? "block");
+
+    const noInlineMarks = children.every((child) => (child.marks?.length ?? 0) === 0);
+    const noMarkDefs = !Array.isArray(block.markDefs) || block.markDefs.length === 0;
+
+    if (block.style === "normal" && noInlineMarks && noMarkDefs) {
+      const text = children.map((child) => child.text ?? "").join("");
+      const headingMatch = text.match(MARKDOWN_HEADING_IN_TEXT);
+      if (headingMatch) {
+        const marks = headingMatch[1].replace(/[＃]/gu, "#");
+        const headingText = headingMatch[2];
+        const level = Math.min(4, Math.max(2, marks.length));
+        return {
+          ...block,
+          style: `h${level}` as PortableTextBlock["style"],
+          children: [
+            {
+              _type: "span",
+              _key: `${block._key ?? "block"}-heading`,
+              marks: [],
+              text: headingText,
+            },
+          ],
+        };
+      }
+    }
+
+    return {
+      ...block,
+      children,
+    };
+  });
+
 const createPortableTextComponents = (): PortableTextComponents => {
   const generateHeadingId = createHeadingIdGenerator();
 
@@ -154,6 +264,13 @@ const createPortableTextComponents = (): PortableTextComponents => {
       youtubeEmbed: ({ value }: { value: YouTubeEmbedValue }) => renderYouTubeEmbed(value),
     },
     marks: {
+      strong: ({ children }) => <strong className="font-semibold text-neutral-900">{children}</strong>,
+      em: ({ children }) => <em className="italic">{children}</em>,
+      code: ({ children }) => (
+        <code className="rounded bg-neutral-100 px-1 py-0.5 text-sm text-primary-800">{children}</code>
+      ),
+      "strike-through": ({ children }) => <del>{children}</del>,
+      underline: ({ children }) => <span className="underline">{children}</span>,
       link: ({ children, value }) => {
         const isExternal = value?.href?.startsWith("http");
         return (
@@ -257,6 +374,7 @@ const extractEmbedFromParagraph = (node: Element | undefined): ReactNode | null 
 };
 
 const MarkdownBody = ({ markdown }: { markdown: string }) => {
+  const normalizedMarkdown = normalizeMarkdownEmphasis(markdown);
   const generateHeadingId = createHeadingIdGenerator();
 
   const markdownComponents: MarkdownComponents = {
@@ -367,7 +485,7 @@ const MarkdownBody = ({ markdown }: { markdown: string }) => {
 
   return (
     <ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]} components={markdownComponents}>
-      {markdown}
+      {normalizedMarkdown}
     </ReactMarkdown>
   );
 };
@@ -383,9 +501,10 @@ export const RichTextContent = ({ portable, markdown }: PortableOrMarkdown) => {
   }
 
   if (portable && portable.length > 0) {
+    const normalizedPortable = normalizePortableMarkdownLike(portable);
     return (
       <div className="prose prose-neutral max-w-none">
-        <PortableText value={portable} components={createPortableTextComponents()} />
+        <PortableText value={normalizedPortable} components={createPortableTextComponents()} />
       </div>
     );
   }

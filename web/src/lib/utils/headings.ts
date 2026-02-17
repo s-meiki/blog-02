@@ -5,6 +5,7 @@ import { visit } from "unist-util-visit";
 import { toString } from "mdast-util-to-string";
 import type { Heading as MdHeading } from "mdast";
 import type { PortableTextBlock, PortableTextSpan } from "@portabletext/types";
+import { normalizeMarkdownEmphasis } from "./normalize-markdown";
 
 export type Heading = {
   id: string;
@@ -31,21 +32,46 @@ export const createHeadingIdGenerator = () => {
 const getPortableBlockText = (block: PortableTextBlock) =>
   (block.children as PortableTextSpan[] | undefined)?.map((child) => child.text ?? "").join("") ?? "";
 
+const MARKDOWN_HEADING_IN_TEXT = /^[^\S\r\n]*([#＃]{2,4})[^\S\r\n]+(.+)$/u;
+
 export const extractHeadings = (blocks: PortableTextBlock[] | null | undefined): Heading[] => {
   if (!blocks) return [];
   const generateId = createHeadingIdGenerator();
 
   return blocks
-    .filter((block) => block._type === "block" && block.style && /^h[2-4]$/.test(block.style))
+    .filter((block) => block._type === "block")
     .map((block) => {
-      const text = getPortableBlockText(block).trim();
+      if (block.style && /^h[2-4]$/.test(block.style)) {
+        const text = getPortableBlockText(block).trim();
+        if (!text) {
+          return null;
+        }
+        return {
+          id: generateId(text),
+          text,
+          level: Number(block.style?.replace("h", "")),
+        };
+      }
+
+      if (block.style !== "normal") {
+        return null;
+      }
+
+      const rawText = getPortableBlockText(block);
+      const match = rawText.match(MARKDOWN_HEADING_IN_TEXT);
+      if (!match) {
+        return null;
+      }
+
+      const level = Math.min(4, Math.max(2, match[1].replace(/[＃]/gu, "#").length));
+      const text = match[2].trim();
       if (!text) {
         return null;
       }
       return {
         id: generateId(text),
         text,
-        level: Number(block.style?.replace("h", "")),
+        level,
       };
     })
     .filter((heading): heading is Heading => Boolean(heading));
@@ -54,7 +80,7 @@ export const extractHeadings = (blocks: PortableTextBlock[] | null | undefined):
 export const extractHeadingsFromMarkdown = (markdown: string | null | undefined): Heading[] => {
   if (!markdown) return [];
 
-  const tree = unified().use(remarkParse).use(remarkGfm).parse(markdown);
+  const tree = unified().use(remarkParse).use(remarkGfm).parse(normalizeMarkdownEmphasis(markdown));
   const generateId = createHeadingIdGenerator();
   const headings: Heading[] = [];
 

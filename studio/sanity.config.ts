@@ -7,6 +7,7 @@ import "./custom.css";
 
 import { structure, canUseAction, defaultDocumentNode } from "./structure";
 import schemaTypes from "./schemaTypes";
+import { NormalizedMarkdownInput } from "./components/NormalizedMarkdownInput";
 
 const importMetaEnv =
   (import.meta as ImportMeta & {
@@ -40,7 +41,7 @@ export default defineConfig({
       defaultDocumentNode,
     }),
     visionTool(),
-    markdownSchema(),
+    markdownSchema({ input: NormalizedMarkdownInput }),
   ],
   document: {
     actions: (prev, context) =>

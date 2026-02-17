@@ -1,10 +1,16 @@
 import { defineField, defineType } from "sanity";
 import { isUniqueAcrossAllDocuments } from "../../lib/isUnique";
+import { resolveDefaultAuthorReference } from "../../lib/defaultAuthor";
 
 export default defineType({
   name: "post",
   title: "記事",
   type: "document",
+  initialValue: async ({ getClient }) => {
+    const author = await resolveDefaultAuthorReference(getClient);
+    if (!author) return {};
+    return { author };
+  },
   fields: [
     defineField({
       name: "title",
@@ -109,26 +115,7 @@ export default defineType({
       title: "著者",
       type: "reference",
       to: [{ type: "author" }],
-      initialValue: async ({ getClient }) => {
-        try {
-          const client = getClient({ apiVersion: "2023-10-01" });
-          const authorId =
-            (await client.fetch<string | null>(
-              `*[_type == "author" && (slug.current == $slug || name == $name)][0]._id`,
-              { slug: "meiki", name: "meiki" },
-            )) ?? null;
-
-          if (!authorId) return undefined;
-
-          return {
-            _type: "reference",
-            _ref: authorId,
-          };
-        } catch (error) {
-          console.warn("Failed to resolve default author", error);
-          return undefined;
-        }
-      },
+      initialValue: async ({ getClient }) => resolveDefaultAuthorReference(getClient),
       validation: (rule) => rule.required(),
     }),
     defineField({
