@@ -24,6 +24,7 @@ import type { PostDetail, PostListItem } from "@/lib/sanity/types";
 import { extractHeadingsFromMarkdown, extractHeadings } from "@/lib/utils/headings";
 import { cn } from "@/lib/utils/cn";
 import { buildBlogPostingJsonLd, buildBreadcrumbJsonLd } from "@/lib/structured-data";
+import { urlForImage } from "@/lib/image";
 import type { Metadata } from "next";
 
 export const revalidate = 60;
@@ -50,7 +51,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const description = post.seo?.description ?? post.excerpt;
   const siteUrl = settings?.siteUrl ?? process.env.NEXT_PUBLIC_SITE_URL;
   const url = siteUrl ? `${siteUrl}/blog/${post.slug}` : undefined;
-  const ogImage = post.seo?.ogImage?.asset?._ref ? undefined : post.coverImage?.url;
+  const seoOgImage = post.seo?.ogImage?.asset?._ref
+    ? urlForImage(post.seo.ogImage).width(1200).height(630).fit("crop").url()
+    : undefined;
+  const ogImage = seoOgImage ?? post.coverImage?.url ?? settings?.defaultOgImage;
 
   return {
     title,
@@ -63,13 +67,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       description,
       type: "article",
       url,
-      images: post.seo?.ogImage?.asset?._ref
-        ? [{ url: `/api/og?slug=${post.slug}` }]
-        : ogImage
-          ? [{ url: ogImage }]
-          : settings?.defaultOgImage
-            ? [{ url: settings.defaultOgImage }]
-            : undefined,
+      images: ogImage ? [{ url: ogImage }] : undefined,
       authors: post.author?.name ? [post.author.name] : undefined,
       tags: post.tags,
       publishedTime: post.publishedAt,
@@ -79,13 +77,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       card: "summary_large_image",
       title,
       description,
-      images: post.seo?.ogImage?.asset?._ref
-        ? [`/api/og?slug=${post.slug}`]
-        : ogImage
-          ? [ogImage]
-          : settings?.defaultOgImage
-            ? [settings.defaultOgImage]
-            : undefined,
+      images: ogImage ? [ogImage] : undefined,
     },
   };
 }

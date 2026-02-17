@@ -1,6 +1,7 @@
 import { defineField, defineType } from "sanity";
 import { isUniqueAcrossAllDocuments } from "../../lib/isUnique";
 import { resolveDefaultAuthorReference } from "../../lib/defaultAuthor";
+import { AutoSeoInput } from "../../components/AutoSeoInput";
 
 export default defineType({
   name: "post",
@@ -46,7 +47,7 @@ export default defineType({
           name: "alt",
           title: "代替テキスト",
           type: "string",
-          validation: (rule) => rule.required().max(120),
+          validation: (rule) => rule.max(120),
         }),
       ],
       validation: (rule) => rule.required(),
@@ -149,6 +150,10 @@ export default defineType({
       name: "seo",
       title: "SEO",
       type: "seo",
+      description: "タイトル・ディスクリプション・OG画像は本文に合わせて自動入力されます。",
+      components: {
+        input: AutoSeoInput,
+      },
     }),
   ],
   preview: {
