@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import Link from "next/link";
 import {
   Twitter,
   Mail,
@@ -207,13 +208,13 @@ export default function ProfilePage() {
             </a>
 
             <div className="col-span-2 mt-2">
-              <a
-                href="mailto:contact@example.com"
+              <Link
+                href="/contact"
                 className="flex items-center justify-center gap-2 rounded-2xl border border-primary-900/10 py-3 text-sm font-bold text-primary-900 transition-colors hover:bg-primary-50"
               >
                 <Mail className="h-4 w-4" />
                 お問い合わせはこちら
-              </a>
+              </Link>
             </div>
           </section>
         </div>

@@ -15,7 +15,13 @@ type HeaderProps = {
 export const Header = ({ settings }: HeaderProps) => {
   const [open, setOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
-  const nav = [...(settings?.navigation ?? []), { label: "Blog", href: "/blog" }, { label: "Profile", href: "/profile" }, { label: "Newsletter", href: "/newsletter" }];
+  const nav = [
+    ...(settings?.navigation ?? []),
+    { label: "Blog", href: "/blog" },
+    { label: "Profile", href: "/profile" },
+    { label: "Contact", href: "/contact" },
+    { label: "Newsletter", href: "/newsletter" },
+  ];
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
