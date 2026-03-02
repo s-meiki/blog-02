@@ -2,6 +2,7 @@
 
 import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import Script from "next/script";
+import { AlertCircle, CheckCircle2, Sparkles } from "lucide-react";
 
 type TurnstileRenderOptions = {
   sitekey: string;
@@ -125,7 +126,7 @@ export const ContactForm = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
+    <form onSubmit={handleSubmit} className="space-y-6">
       <Script
         src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"
         strategy="afterInteractive"
@@ -134,7 +135,10 @@ export const ContactForm = () => {
 
       <div className="grid gap-5 sm:grid-cols-2">
         <label className="space-y-2 text-sm font-medium text-neutral-700">
-          <span>お名前</span>
+          <span className="inline-flex items-center gap-2">
+            お名前
+            <span className="rounded-full bg-accent-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-accent-600">Required</span>
+          </span>
           <input
             type="text"
             name="name"
@@ -143,12 +147,16 @@ export const ContactForm = () => {
             onChange={(event) => setName(event.target.value)}
             required
             maxLength={80}
-            className="w-full rounded-xl border border-primary-900/15 bg-white px-4 py-3 text-neutral-800 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-200"
+            placeholder="例) 山田 太郎"
+            className="w-full rounded-2xl border border-primary-900/15 bg-white px-4 py-3 text-neutral-800 shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] outline-none transition focus:border-primary-500 focus:ring-4 focus:ring-primary-100"
           />
         </label>
 
         <label className="space-y-2 text-sm font-medium text-neutral-700">
-          <span>メールアドレス</span>
+          <span className="inline-flex items-center gap-2">
+            メールアドレス
+            <span className="rounded-full bg-accent-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-accent-600">Required</span>
+          </span>
           <input
             type="email"
             name="email"
@@ -157,13 +165,17 @@ export const ContactForm = () => {
             onChange={(event) => setEmail(event.target.value)}
             required
             maxLength={120}
-            className="w-full rounded-xl border border-primary-900/15 bg-white px-4 py-3 text-neutral-800 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-200"
+            placeholder="example@company.com"
+            className="w-full rounded-2xl border border-primary-900/15 bg-white px-4 py-3 text-neutral-800 shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] outline-none transition focus:border-primary-500 focus:ring-4 focus:ring-primary-100"
           />
         </label>
       </div>
 
       <label className="block space-y-2 text-sm font-medium text-neutral-700">
-        <span>お問い合わせ内容</span>
+        <span className="inline-flex items-center gap-2">
+          お問い合わせ内容
+          <span className="rounded-full bg-accent-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-accent-600">Required</span>
+        </span>
         <textarea
           name="message"
           value={message}
@@ -172,12 +184,17 @@ export const ContactForm = () => {
           minLength={10}
           maxLength={2000}
           rows={7}
-          className="w-full rounded-xl border border-primary-900/15 bg-white px-4 py-3 text-neutral-800 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-200"
+          placeholder="ご相談内容や目的、希望時期などをご記入ください。"
+          className="w-full rounded-2xl border border-primary-900/15 bg-white px-4 py-3 text-neutral-800 shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] outline-none transition focus:border-primary-500 focus:ring-4 focus:ring-primary-100"
         />
       </label>
 
-      <div className="space-y-2">
-        <div ref={widgetContainerRef} />
+      <div className="space-y-2 rounded-2xl border border-dashed border-primary-900/20 bg-neutral-50/90 p-4">
+        <p className="flex items-center gap-2 text-xs font-medium text-neutral-600">
+          <Sparkles className="h-3.5 w-3.5 text-accent-500" />
+          不正送信防止のため bot 判定を行います
+        </p>
+        <div ref={widgetContainerRef} className="min-h-[66px]" />
         {!siteKey && (
           <p className="text-sm font-medium text-red-700">
             Turnstile site key が設定されていないため送信できません。
@@ -188,19 +205,26 @@ export const ContactForm = () => {
       <button
         type="submit"
         disabled={isSubmitting || !turnstileToken || !siteKey}
-        className="inline-flex items-center justify-center rounded-full bg-primary-800 px-6 py-3 text-sm font-semibold text-white transition hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-60"
+        className="inline-flex w-full items-center justify-center rounded-full bg-gradient-to-r from-primary-800 via-primary-700 to-primary-600 px-6 py-3 text-sm font-semibold text-white shadow-soft transition hover:-translate-y-0.5 hover:from-primary-700 hover:to-primary-600 disabled:translate-y-0 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
       >
         {isSubmitting ? "送信中..." : "送信する"}
       </button>
 
       {status !== "idle" && (
-        <p
-          className={`text-sm font-medium ${
-            status === "success" ? "text-emerald-700" : "text-red-700"
+        <div
+          className={`flex items-start gap-2 rounded-2xl border px-4 py-3 text-sm font-medium ${
+            status === "success"
+              ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+              : "border-red-200 bg-red-50 text-red-700"
           }`}
         >
-          {statusMessage}
-        </p>
+          {status === "success" ? (
+            <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" />
+          ) : (
+            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+          )}
+          <p>{statusMessage}</p>
+        </div>
       )}
     </form>
   );
