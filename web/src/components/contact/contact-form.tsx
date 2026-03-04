@@ -2,7 +2,7 @@
 
 import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import Script from "next/script";
-import { AlertCircle, CheckCircle2, Sparkles } from "lucide-react";
+import { AlertCircle, CheckCircle2 } from "lucide-react";
 
 type TurnstileRenderOptions = {
   sitekey: string;
@@ -126,7 +126,7 @@ export const ContactForm = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-7">
       <Script
         src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"
         strategy="afterInteractive"
@@ -134,10 +134,9 @@ export const ContactForm = () => {
       />
 
       <div className="grid gap-5 sm:grid-cols-2">
-        <label className="space-y-2 text-sm font-medium text-neutral-700">
-          <span className="inline-flex items-center gap-2">
-            お名前
-            <span className="rounded-full bg-accent-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-accent-600">Required</span>
+        <label className="space-y-2 text-sm font-semibold text-primary-800">
+          <span>
+            お名前 <span className="text-rose-500">*</span>
           </span>
           <input
             type="text"
@@ -147,15 +146,14 @@ export const ContactForm = () => {
             onChange={(event) => setName(event.target.value)}
             required
             maxLength={80}
-            placeholder="例) 山田 太郎"
-            className="w-full rounded-2xl border border-primary-900/15 bg-white px-4 py-3 text-neutral-800 shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] outline-none transition focus:border-primary-500 focus:ring-4 focus:ring-primary-100"
+            placeholder="お名前を入力してください"
+            className="w-full rounded-2xl border border-slate-300 bg-white px-5 py-3.5 text-neutral-800 outline-none transition focus:border-[#6f4ef6] focus:ring-4 focus:ring-[#6f4ef6]/15"
           />
         </label>
 
-        <label className="space-y-2 text-sm font-medium text-neutral-700">
-          <span className="inline-flex items-center gap-2">
-            メールアドレス
-            <span className="rounded-full bg-accent-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-accent-600">Required</span>
+        <label className="space-y-2 text-sm font-semibold text-primary-800">
+          <span>
+            メールアドレス <span className="text-rose-500">*</span>
           </span>
           <input
             type="email"
@@ -166,15 +164,14 @@ export const ContactForm = () => {
             required
             maxLength={120}
             placeholder="example@company.com"
-            className="w-full rounded-2xl border border-primary-900/15 bg-white px-4 py-3 text-neutral-800 shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] outline-none transition focus:border-primary-500 focus:ring-4 focus:ring-primary-100"
+            className="w-full rounded-2xl border border-slate-300 bg-white px-5 py-3.5 text-neutral-800 outline-none transition focus:border-[#6f4ef6] focus:ring-4 focus:ring-[#6f4ef6]/15"
           />
         </label>
       </div>
 
-      <label className="block space-y-2 text-sm font-medium text-neutral-700">
-        <span className="inline-flex items-center gap-2">
-          お問い合わせ内容
-          <span className="rounded-full bg-accent-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-accent-600">Required</span>
+      <label className="block space-y-2 text-sm font-semibold text-primary-800">
+        <span>
+          メッセージ <span className="text-rose-500">*</span>
         </span>
         <textarea
           name="message"
@@ -183,21 +180,19 @@ export const ContactForm = () => {
           required
           minLength={10}
           maxLength={2000}
-          rows={7}
-          placeholder="ご相談内容や目的、希望時期などをご記入ください。"
-          className="w-full rounded-2xl border border-primary-900/15 bg-white px-4 py-3 text-neutral-800 shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] outline-none transition focus:border-primary-500 focus:ring-4 focus:ring-primary-100"
+          rows={8}
+          placeholder="メッセージを入力してください"
+          className="w-full rounded-2xl border border-slate-300 bg-white px-5 py-3.5 text-neutral-800 outline-none transition focus:border-[#6f4ef6] focus:ring-4 focus:ring-[#6f4ef6]/15"
         />
       </label>
 
-      <div className="space-y-2 rounded-2xl border border-dashed border-primary-900/20 bg-neutral-50/90 p-4">
-        <p className="flex items-center gap-2 text-xs font-medium text-neutral-600">
-          <Sparkles className="h-3.5 w-3.5 text-accent-500" />
-          不正送信防止のため bot 判定を行います
-        </p>
-        <div ref={widgetContainerRef} className="min-h-[66px]" />
+      <div className="space-y-2">
+        <div className="flex justify-center">
+          <div ref={widgetContainerRef} className="min-h-[66px]" />
+        </div>
         {!siteKey && (
-          <p className="text-sm font-medium text-red-700">
-            Turnstile site key が設定されていないため送信できません。
+          <p className="text-center text-sm font-medium text-red-700">
+            NEXT_PUBLIC_CF_SITE_KEY が未設定のため送信できません。
           </p>
         )}
       </div>
@@ -205,7 +200,7 @@ export const ContactForm = () => {
       <button
         type="submit"
         disabled={isSubmitting || !turnstileToken || !siteKey}
-        className="inline-flex w-full items-center justify-center rounded-full bg-gradient-to-r from-primary-800 via-primary-700 to-primary-600 px-6 py-3 text-sm font-semibold text-white shadow-soft transition hover:-translate-y-0.5 hover:from-primary-700 hover:to-primary-600 disabled:translate-y-0 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+        className="mx-auto inline-flex min-w-[220px] items-center justify-center rounded-full bg-gradient-to-r from-[#7d3ff0] via-[#5c4ef6] to-[#2e6bf0] px-8 py-3.5 text-lg font-semibold text-white shadow-[0_16px_40px_-18px_rgba(70,70,190,0.75)] transition hover:-translate-y-0.5 hover:brightness-105 disabled:translate-y-0 disabled:cursor-not-allowed disabled:opacity-60"
       >
         {isSubmitting ? "送信中..." : "送信する"}
       </button>
