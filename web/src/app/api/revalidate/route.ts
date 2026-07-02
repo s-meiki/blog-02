@@ -2,8 +2,6 @@ import { headers } from "next/headers";
 import { revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 
-export const runtime = "edge";
-
 const secret = process.env.REVALIDATE_SECRET;
 
 export async function POST(request: Request) {

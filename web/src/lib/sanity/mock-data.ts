@@ -10,6 +10,7 @@ import {
   authorDetailQuery,
   authorSlugsQuery,
   categoryDetailQuery,
+  categoryHighlightsQuery,
   categorySlugsQuery,
   latestPostsQuery,
   paginatedPostsCountQuery,
@@ -27,6 +28,7 @@ import {
 import type {
   AuthorDetail,
   CategoryDetail,
+  CategoryHighlight,
   PageDetail,
   PostDetail,
   PostListItem,
@@ -351,10 +353,31 @@ const filterPosts = (params: QueryParams) => {
   );
 };
 
+const getCategoryHighlights = (): CategoryHighlight[] =>
+  mockCategories.slice(0, 6).map((category) => {
+    const posts = mockPosts.filter((post) =>
+      post.categories?.some((postCategory) => postCategory.slug === category.slug),
+    );
+    const featuredPost = sortByPopularity(posts)[0];
+
+    return {
+      ...category,
+      postCount: posts.length,
+      featuredPost: featuredPost
+        ? {
+            title: featuredPost.title,
+            slug: featuredPost.slug,
+            excerpt: featuredPost.excerpt,
+          }
+        : undefined,
+    };
+  });
+
 const handlers = new Map<string, QueryHandler>([
   [siteSettingsQuery, () => mockSiteSettings],
   [latestPostsQuery, () => sortByPublishedDesc(mockPosts).slice(0, 6).map(toListItem)],
   [popularPostsQuery, () => sortByPopularity(mockPosts).slice(0, 5).map(toListItem)],
+  [categoryHighlightsQuery, getCategoryHighlights],
   [paginatedPostsQuery, (params) => {
     const filtered = filterPosts(params);
     const offset = toNumber(params.offset, 0);

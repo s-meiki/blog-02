@@ -6,8 +6,6 @@ import { sanityFetch } from "@/lib/sanity/fetch";
 import { singlePostQuery } from "@/lib/sanity/queries";
 import type { PostDetail } from "@/lib/sanity/types";
 
-export const runtime = "edge";
-
 const loadPost = async (slug: string) =>
   sanityFetch<PostDetail | null>(singlePostQuery, { slug }, { revalidate: 60, tags: ["post", `post:${slug}`] });
 

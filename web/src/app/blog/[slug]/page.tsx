@@ -99,7 +99,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
 
   const relatedPosts = await sanityFetch<PostListItem[]>(
     relatedPostsQuery,
-    { slug, category: post.categories?.[0]?.slug },
+    { slug, category: post.categories?.[0]?.slug ?? null },
     { revalidate: 300, tags: ["post"] },
   );
 
