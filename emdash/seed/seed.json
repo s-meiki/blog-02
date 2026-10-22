@@ -1,0 +1,197 @@
+{
+	"$schema": "https://emdashcms.com/seed.schema.json",
+	"version": "1",
+	"meta": {
+		"name": "blog-02",
+		"description": "Sanity から移行したブログ",
+		"author": "s-meiki"
+	},
+	"settings": {
+		"title": "My Blog",
+		"tagline": "日々の開発と学びの記録"
+	},
+	"collections": [
+		{
+			"slug": "posts",
+			"label": "記事",
+			"labelSingular": "記事",
+			"urlPattern": "/blog/{slug}",
+			"supports": [
+				"drafts",
+				"revisions",
+				"preview",
+				"scheduling",
+				"search",
+				"seo"
+			],
+			"commentsEnabled": false,
+			"fields": [
+				{
+					"slug": "title",
+					"label": "タイトル",
+					"type": "string",
+					"required": true,
+					"searchable": true
+				},
+				{
+					"slug": "excerpt",
+					"label": "リード文",
+					"type": "text",
+					"searchable": true
+				},
+				{
+					"slug": "featured_image",
+					"label": "カバー画像",
+					"type": "image"
+				},
+				{
+					"slug": "content",
+					"label": "本文",
+					"type": "portableText",
+					"searchable": true
+				},
+				{
+					"slug": "revised_at",
+					"label": "更新日",
+					"type": "datetime"
+				},
+				{
+					"slug": "featured",
+					"label": "特集表示",
+					"type": "boolean"
+				},
+				{
+					"slug": "popular_score",
+					"label": "人気スコア",
+					"type": "integer"
+				}
+			]
+		},
+		{
+			"slug": "pages",
+			"label": "固定ページ",
+			"labelSingular": "固定ページ",
+			"urlPattern": "/{slug}",
+			"supports": [
+				"drafts",
+				"revisions",
+				"preview",
+				"search",
+				"seo"
+			],
+			"fields": [
+				{
+					"slug": "title",
+					"label": "タイトル",
+					"type": "string",
+					"required": true,
+					"searchable": true
+				},
+				{
+					"slug": "content",
+					"label": "本文",
+					"type": "portableText",
+					"searchable": true
+				}
+			]
+		}
+	],
+	"taxonomies": [
+		{
+			"name": "category",
+			"label": "カテゴリ",
+			"labelSingular": "カテゴリ",
+			"hierarchical": true,
+			"collections": [
+				"posts"
+			],
+			"terms": []
+		},
+		{
+			"name": "tag",
+			"label": "タグ",
+			"labelSingular": "タグ",
+			"hierarchical": false,
+			"collections": [
+				"posts"
+			],
+			"terms": []
+		}
+	],
+	"menus": [
+		{
+			"name": "primary",
+			"label": "メインナビゲーション",
+			"items": [
+				{
+					"type": "custom",
+					"label": "ホーム",
+					"url": "/"
+				},
+				{
+					"type": "custom",
+					"label": "ブログ",
+					"url": "/blog"
+				},
+				{
+					"type": "custom",
+					"label": "プロフィール",
+					"url": "/profile"
+				},
+				{
+					"type": "custom",
+					"label": "お問い合わせ",
+					"url": "/contact"
+				}
+			]
+		}
+	],
+	"widgetAreas": [
+		{
+			"name": "sidebar",
+			"label": "サイドバー",
+			"description": "記事ページのサイドバー",
+			"widgets": [
+				{
+					"type": "component",
+					"componentId": "core:search",
+					"title": "検索"
+				},
+				{
+					"type": "component",
+					"componentId": "core:categories",
+					"title": "カテゴリ"
+				},
+				{
+					"type": "component",
+					"componentId": "core:tags",
+					"title": "タグ"
+				},
+				{
+					"type": "component",
+					"componentId": "core:recent-posts",
+					"title": "最新記事",
+					"props": {
+						"count": 5,
+						"showDate": true
+					}
+				},
+				{
+					"type": "component",
+					"componentId": "core:archives",
+					"title": "アーカイブ",
+					"props": {
+						"type": "monthly",
+						"limit": 6
+					}
+				}
+			]
+		},
+		{
+			"name": "footer",
+			"label": "フッター",
+			"description": "サイトフッター",
+			"widgets": []
+		}
+	]
+}
